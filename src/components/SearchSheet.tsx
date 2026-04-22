@@ -26,7 +26,7 @@ export const SearchSheet = ({ open, onClose, defaultMeal, onAddCustom }: Props) 
   const [qty, setQty] = useState(100);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => { if (open) { setMeal(defaultMeal); setTimeout(() => inputRef.current?.focus(), 250); } else { setQuery(""); setSelected(null); setCategory("All"); setQty(100); } }, [open, defaultMeal]);
+  useEffect(() => { if (open) { setMeal(defaultMeal); } else { setQuery(""); setSelected(null); setCategory("All"); setQty(100); } }, [open, defaultMeal]);
 
   const allFoods = useMemo(() => [...customFoods, ...IFCT_FOODS], [customFoods]);
 
