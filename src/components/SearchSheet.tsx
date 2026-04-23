@@ -25,8 +25,20 @@ export const SearchSheet = ({ open, onClose, defaultMeal, onAddCustom }: Props) 
   const [selected, setSelected] = useState<FoodItem | null>(null);
   const [qty, setQty] = useState(100);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [hasFocused, setHasFocused] = useState(false);
 
-  useEffect(() => { if (open) { setMeal(defaultMeal); } else { setQuery(""); setSelected(null); setCategory("All"); setQty(100); } }, [open, defaultMeal]);
+  useEffect(() => {
+    if (open) {
+      setMeal(defaultMeal);
+      setHasFocused(false);
+      // Defensive: blur any focused element when sheet opens
+      if (typeof document !== "undefined" && document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur();
+      }
+    } else {
+      setQuery(""); setSelected(null); setCategory("All"); setQty(100); setHasFocused(false);
+    }
+  }, [open, defaultMeal]);
 
   const allFoods = useMemo(() => [...customFoods, ...IFCT_FOODS], [customFoods]);
 
@@ -111,9 +123,19 @@ export const SearchSheet = ({ open, onClose, defaultMeal, onAddCustom }: Props) 
           <div className="px-4 pb-3">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <input ref={inputRef} value={query} onChange={(e) => setQuery(e.target.value)}
+              <input
+                ref={inputRef}
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search 100+ Indian foods…"
-                className="w-full pl-9 pr-3 py-3 rounded-xl bg-muted border-0 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40" />
+                autoFocus={false}
+                tabIndex={-1}
+                readOnly={!hasFocused}
+                onFocus={() => setHasFocused(true)}
+                onTouchStart={() => setHasFocused(true)}
+                onClick={() => setHasFocused(true)}
+                className="w-full pl-9 pr-3 py-3 rounded-xl bg-muted border-0 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+              />
             </div>
           </div>
 
