@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { forwardRef, useEffect, useRef, useState } from "react";
 import { format, parseISO } from "date-fns";
 import html2canvas from "html2canvas";
 import { Download, Share2, X } from "lucide-react";
@@ -204,20 +204,17 @@ export function ShareYearDialog({ open, onClose, year }: Props) {
 
 /* ---------------- Share Card (1080×1080, fixed pixel layout) ---------------- */
 
-const ShareCard = (() => {
-  const Component = (
-    {
-      theme: t, year, userName, stats, grid, months,
-    }: {
-      theme: ShareTheme;
-      year: number;
-      userName: string;
-      stats: ReturnType<typeof computeYearStats>;
-      grid: ReturnType<typeof buildYearGrid>;
-      months: ReturnType<typeof monthLabels>;
-    },
-    ref: React.Ref<HTMLDivElement>,
-  ) => {
+interface ShareCardProps {
+  theme: ShareTheme;
+  year: number;
+  userName: string;
+  stats: ReturnType<typeof computeYearStats>;
+  grid: ReturnType<typeof buildYearGrid>;
+  months: ReturnType<typeof monthLabels>;
+}
+
+const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
+  ({ theme: t, year, userName, stats, grid, months }, ref) => {
     const SQ = 16; // bigger squares for share
     const GAP = 3;
     const colW = SQ + GAP;
