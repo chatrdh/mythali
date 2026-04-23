@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { Bar, BarChart, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis, PieChart, Pie } from "recharts";
 import { addDays, format, startOfDay } from "date-fns";
 import { useStore } from "@/store/useStore";
+import { YearHeatmap } from "@/components/YearHeatmap";
 
 export default function Insights() {
   const { logs, settings } = useStore();
@@ -60,8 +61,10 @@ export default function Insights() {
   };
 
   return (
-    <div className="max-w-md mx-auto pb-28 safe-top px-4 pt-4 space-y-4">
+    <div className="max-w-2xl mx-auto pb-28 safe-top px-4 pt-4 space-y-4">
       <h1 className="text-xl font-bold">Insights</h1>
+
+      <YearHeatmap />
 
       <div className="rounded-2xl bg-card shadow-card p-4 border border-border/50">
         <div className="flex items-center justify-between mb-2">
