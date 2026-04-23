@@ -336,13 +336,9 @@ const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
         </div>
       </div>
     );
-  };
-  return Object.assign(
-    // forwardRef-equivalent
-    require("react").forwardRef(Component) as React.ForwardRefExoticComponent<any>,
-    {},
-  );
-})();
+  },
+);
+ShareCard.displayName = "ShareCard";
 
 function ShareStat({ t, icon, value, label }: { t: ShareTheme; icon: string; value: string; label: string }) {
   return (
