@@ -25,8 +25,20 @@ export const SearchSheet = ({ open, onClose, defaultMeal, onAddCustom }: Props) 
   const [selected, setSelected] = useState<FoodItem | null>(null);
   const [qty, setQty] = useState(100);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [hasFocused, setHasFocused] = useState(false);
 
-  useEffect(() => { if (open) { setMeal(defaultMeal); } else { setQuery(""); setSelected(null); setCategory("All"); setQty(100); } }, [open, defaultMeal]);
+  useEffect(() => {
+    if (open) {
+      setMeal(defaultMeal);
+      setHasFocused(false);
+      // Defensive: blur any focused element when sheet opens
+      if (typeof document !== "undefined" && document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur();
+      }
+    } else {
+      setQuery(""); setSelected(null); setCategory("All"); setQty(100); setHasFocused(false);
+    }
+  }, [open, defaultMeal]);
 
   const allFoods = useMemo(() => [...customFoods, ...IFCT_FOODS], [customFoods]);
 
