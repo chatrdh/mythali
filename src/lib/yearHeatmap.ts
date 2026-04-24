@@ -112,7 +112,7 @@ export function buildYearGrid(logs: FoodLog[], goal: number, year: number, today
 export function computeYearStats(grid: DayCell[][], today = new Date()): YearStats {
   const flat = grid.flat().filter((c) => c.inYear);
   const logged = flat.filter((c) => c.data);
-  const onGoal = logged.filter((c) => c.data!.state === "on_track");
+  const onGoal = logged.filter((c) => c.data!.pct <= 110);
   const best = logged.reduce<DayCell | undefined>(
     (best, c) => (!best || c.data!.kcal > best.data!.kcal ? c : best),
     undefined,
