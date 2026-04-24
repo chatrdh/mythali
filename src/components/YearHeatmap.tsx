@@ -78,31 +78,31 @@ export function YearHeatmap() {
         />
       </div>
 
-      {/* Grid */}
+      {/* Grid — bigger cells for clarity */}
       <div className="overflow-x-auto no-scrollbar -mx-2 px-2">
         <div className="inline-block min-w-full">
-          {/* Month labels — aligned with grid columns (each col = 14px: 12 square + 2 gap) */}
-          <div className="flex mb-1 select-none" style={{ paddingLeft: 24 /* day-label col 20 + gap 4 */ }}>
+          {/* Month labels — aligned with grid columns (each col = 16 + 3 gap = 19px) */}
+          <div className="flex mb-1.5 select-none" style={{ paddingLeft: 30 /* day-label col 26 + gap 4 */ }}>
             {grid.map((_, i) => {
               const m = months.find((mm) => mm.col === i);
               return (
-                <div key={i} style={{ width: 14 }} className="text-[10px] text-muted-foreground font-medium">
+                <div key={i} style={{ width: 19 }} className="text-[11px] text-muted-foreground font-medium">
                   {m?.label ?? ""}
                 </div>
               );
             })}
           </div>
-          <div className="flex" style={{ gap: 2 }}>
-            {/* Day labels — match grid cell height (12) + gap (2) = 14 */}
-            <div className="flex flex-col select-none" style={{ width: 20, marginRight: 2, gap: 2 }}>
+          <div className="flex" style={{ gap: 3 }}>
+            {/* Day labels — match grid cell height (16) + gap (3) = 19 */}
+            <div className="flex flex-col select-none" style={{ width: 26, marginRight: 1, gap: 3 }}>
               {["Mon", "", "Wed", "", "Fri", "", ""].map((d, i) => (
-                <div key={i} style={{ height: 12, lineHeight: "12px" }} className="text-[10px] text-muted-foreground">
+                <div key={i} style={{ height: 16, lineHeight: "16px" }} className="text-[11px] text-muted-foreground">
                   {d}
                 </div>
               ))}
             </div>
             {grid.map((col, ci) => (
-              <div key={ci} className="flex flex-col" style={{ gap: 2 }}>
+              <div key={ci} className="flex flex-col" style={{ gap: 3 }}>
                 {col.map((cell) => {
                   const today = isToday(cell.date);
                   return (
@@ -112,12 +112,12 @@ export function YearHeatmap() {
                       onMouseMove={(e) => cell.inYear && setHover({ cell, x: e.clientX, y: e.clientY })}
                       onMouseLeave={() => setHover(null)}
                       onClick={(e) => cell.inYear && setHover({ cell, x: e.clientX, y: e.clientY })}
-                      className="rounded-[2px] transition-transform hover:scale-150 cursor-pointer"
+                      className="rounded-[3px] transition-transform hover:scale-150 cursor-pointer"
                       style={{
-                        width: 12,
-                        height: 12,
+                        width: 16,
+                        height: 16,
                         background: colorFor(cell, palette),
-                        boxShadow: today ? `inset 0 0 0 1px ${palette.todayBorder}` : undefined,
+                        boxShadow: today ? `inset 0 0 0 1.5px ${palette.todayBorder}` : undefined,
                         opacity: cell.inYear ? 1 : 0.35,
                       }}
                     />
@@ -129,25 +129,10 @@ export function YearHeatmap() {
         </div>
       </div>
 
-      {/* Legend */}
-      <div className="flex items-center justify-between gap-2 flex-wrap text-[10px] text-muted-foreground">
-        <span>Less</span>
-        <div className="flex items-center gap-[3px]">
-          <Swatch c={palette.empty} />
-          <Swatch c={palette.under[2]} />
-          <Swatch c={palette.on_track[1]} />
-          <Swatch c={palette.on_track[3]} />
-          <Swatch c={palette.over[2]} />
-          <Swatch c={palette.big_over[2]} />
-          <Swatch c={palette.way_over[2]} />
-        </div>
-        <span>More</span>
-      </div>
-      <div className="flex items-center gap-3 flex-wrap text-[10px] text-muted-foreground -mt-2">
-        <LegendDot c={palette.under[2]} label="Under" />
-        <LegendDot c={palette.on_track[3]} label="On goal" />
-        <LegendDot c={palette.over[2]} label="Over" />
-        <LegendDot c={palette.way_over[2]} label="Cheat day" />
+      {/* Legend — simplified to two states */}
+      <div className="flex items-center justify-center gap-5 text-xs text-muted-foreground">
+        <LegendDot c={palette.on_track[2]} label="On goal" />
+        <LegendDot c={palette.over[2]} label="Over goal" />
       </div>
 
       {/* Tooltip */}
