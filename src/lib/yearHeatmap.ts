@@ -172,35 +172,41 @@ export interface HeatmapPalette {
   todayBorder: string;
 }
 
+// Two-state palette: on goal (≤ goal) vs over goal (> goal).
+// Intensity 1/2/3 kept for type-compat but all map to same color per state.
 export const PALETTES: Record<ThemeMode, HeatmapPalette> = {
   dark: {
     empty: "#1e1e1e",
     outOfYear: "#141414",
-    under:    { 1: "#0d2a3d", 2: "#1a4a6b", 3: "#2196F3" },
-    light:    { 1: "#0d2a3d", 2: "#1a4a6b", 3: "#42a5f5" },
-    on_track: { 1: "#2d6a3f", 2: "#388e3c", 3: "#4CAF50" },
-    over:     { 1: "#cc7a00", 2: "#FF9800", 3: "#ffb74d" },
-    big_over: { 1: "#c62828", 2: "#E53935", 3: "#ef5350" },
-    way_over: { 1: "#8b1a1a", 2: "#b71c1c", 3: "#7f0000" },
-    todayBorder: "rgba(255,255,255,0.55)",
+    under:    { 1: "#4CAF50", 2: "#4CAF50", 3: "#4CAF50" },
+    light:    { 1: "#4CAF50", 2: "#4CAF50", 3: "#4CAF50" },
+    on_track: { 1: "#4CAF50", 2: "#4CAF50", 3: "#4CAF50" },
+    over:     { 1: "#E53935", 2: "#E53935", 3: "#E53935" },
+    big_over: { 1: "#E53935", 2: "#E53935", 3: "#E53935" },
+    way_over: { 1: "#E53935", 2: "#E53935", 3: "#E53935" },
+    todayBorder: "rgba(255,255,255,0.65)",
   },
   light: {
     empty: "#ebedf0",
     outOfYear: "#f5f5f5",
-    under:    { 1: "#cfe5f5", 2: "#64b5f6", 3: "#1976d2" },
-    light:    { 1: "#cfe5f5", 2: "#64b5f6", 3: "#1e88e5" },
-    on_track: { 1: "#a5d6a7", 2: "#66bb6a", 3: "#2e7d32" },
-    over:     { 1: "#ffe0b2", 2: "#ffb74d", 3: "#f57c00" },
-    big_over: { 1: "#ef9a9a", 2: "#ef5350", 3: "#c62828" },
-    way_over: { 1: "#b71c1c", 2: "#8b0000", 3: "#5a0000" },
-    todayBorder: "rgba(0,0,0,0.5)",
+    under:    { 1: "#2e7d32", 2: "#2e7d32", 3: "#2e7d32" },
+    light:    { 1: "#2e7d32", 2: "#2e7d32", 3: "#2e7d32" },
+    on_track: { 1: "#2e7d32", 2: "#2e7d32", 3: "#2e7d32" },
+    over:     { 1: "#c62828", 2: "#c62828", 3: "#c62828" },
+    big_over: { 1: "#c62828", 2: "#c62828", 3: "#c62828" },
+    way_over: { 1: "#c62828", 2: "#c62828", 3: "#c62828" },
+    todayBorder: "rgba(0,0,0,0.55)",
   },
 };
+
+export function isOverGoal(cell: DayCell): boolean {
+  return !!cell.data && cell.data.pct > 110;
+}
 
 export function colorFor(cell: DayCell, palette: HeatmapPalette): string {
   if (!cell.inYear) return palette.outOfYear;
   if (!cell.data) return palette.empty;
-  return palette[cell.data.state][cell.data.intensity];
+  return isOverGoal(cell) ? palette.over[2] : palette.on_track[2];
 }
 
 export function isToday(d: Date, today = new Date()) {
