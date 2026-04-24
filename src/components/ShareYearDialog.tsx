@@ -186,8 +186,8 @@ interface ShareCardProps {
 
 const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
   ({ theme: t, year, userName, goal, stats, grid, months }, ref) => {
-    const SQ = 14;
-    const GAP = 3;
+    const SQ = 18;
+    const GAP = 4;
     const colW = SQ + GAP;
     const gridW = 53 * colW - GAP;
     const displayName = (userName || "").trim() || "Foodie";
@@ -290,15 +290,13 @@ const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
             ))}
           </div>
 
-          {/* Legend inline below grid */}
+          {/* Legend inline below grid — two states */}
           <div style={{
-            display: "flex", alignItems: "center", justifyContent: "center", gap: 18,
-            marginTop: 20, fontSize: 12, color: t.textMuted, fontWeight: 600,
+            display: "flex", alignItems: "center", justifyContent: "center", gap: 24,
+            marginTop: 22, fontSize: 13, color: t.textMuted, fontWeight: 600,
           }}>
-            <LegendChip c={t.palette.under[2]} label="Under" t={t} />
-            <LegendChip c={t.palette.on_track[3]} label="On goal" t={t} />
-            <LegendChip c={t.palette.over[2]} label="Over" t={t} />
-            <LegendChip c={t.palette.way_over[2]} label="Cheat" t={t} />
+            <LegendChip c={t.palette.on_track[2]} label="On goal" t={t} />
+            <LegendChip c={t.palette.over[2]} label="Over goal" t={t} />
           </div>
         </div>
 
