@@ -161,12 +161,12 @@ function StatCard({
 }
 
 function Swatch({ c }: { c: string }) {
-  return <div className="w-2.5 h-2.5 rounded-[2px]" style={{ background: c }} />;
+  return <div className="w-3 h-3 rounded-[3px]" style={{ background: c }} />;
 }
 function LegendDot({ c, label }: { c: string; label: string }) {
   return (
-    <span className="flex items-center gap-1">
-      <span className="w-2 h-2 rounded-sm" style={{ background: c }} />
+    <span className="flex items-center gap-1.5">
+      <span className="w-3 h-3 rounded-sm" style={{ background: c }} />
       {label}
     </span>
   );
@@ -194,7 +194,7 @@ function Tooltip({ x, y, cell }: { x: number; y: number; cell: DayCell }) {
       {d ? (
         <>
           <div className="font-mono-num">🔥 {d.kcal.toLocaleString()} / {d.goal.toLocaleString()} kcal</div>
-          <div className="text-white/70 mb-1">{Math.round(d.pct)}% · {labelFor(d.state)}</div>
+          <div className="text-white/70 mb-1">{Math.round(d.pct)}% · {d.pct <= 110 ? "On goal" : "Over goal"}</div>
           <div className="font-mono-num text-white/80">P {d.protein}g · C {d.carbs}g · F {d.fat}g</div>
         </>
       ) : (
@@ -202,13 +202,4 @@ function Tooltip({ x, y, cell }: { x: number; y: number; cell: DayCell }) {
       )}
     </div>
   );
-}
-
-function labelFor(s: string) {
-  return s === "on_track" ? "On track"
-    : s === "under" ? "Under goal"
-    : s === "light" ? "Light day"
-    : s === "over" ? "A bit over"
-    : s === "big_over" ? "Over goal"
-    : s === "way_over" ? "Cheat day!" : "—";
 }
