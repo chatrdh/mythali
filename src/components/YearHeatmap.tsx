@@ -44,7 +44,9 @@ export function YearHeatmap() {
       <div className="flex items-center justify-between">
         <div>
           <div className="text-sm font-semibold">My Year in Calories</div>
-          <div className="text-xs text-muted-foreground">{year} · {stats.loggedDays} days logged</div>
+          <div className="text-xs text-muted-foreground">
+            {year} · {stats.loggedDays} days logged · vs {settings.calorieGoal.toLocaleString()} kcal goal
+          </div>
         </div>
         <div className="flex items-center gap-2">
           {years.length > 1 && (
