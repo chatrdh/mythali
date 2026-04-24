@@ -20,6 +20,7 @@ interface ShareTheme {
   text: string;
   textMuted: string;
   accent: string;
+  accentSoft: string;
   cardBg: string;
   cardBorder: string;
   palette: HeatmapPalette;
@@ -30,10 +31,11 @@ const THEMES: Record<ThemeKey, ShareTheme> = {
   midnight: {
     key: "midnight",
     name: "Midnight",
-    bg: "linear-gradient(135deg,#0a0a0f 0%,#1a1a2e 50%,#0d1117 100%)",
+    bg: "linear-gradient(160deg,#0a0a0f 0%,#16162a 50%,#0d1117 100%)",
     text: "#ffffff",
-    textMuted: "rgba(255,255,255,0.6)",
+    textMuted: "rgba(255,255,255,0.55)",
     accent: "#FF6F00",
+    accentSoft: "rgba(255,111,0,0.12)",
     cardBg: "rgba(255,255,255,0.04)",
     cardBorder: "rgba(255,255,255,0.08)",
     rangoli: false,
@@ -52,10 +54,11 @@ const THEMES: Record<ThemeKey, ShareTheme> = {
   saffron: {
     key: "saffron",
     name: "Saffron",
-    bg: "linear-gradient(135deg,#1a0a00 0%,#3d1a00 50%,#1a0800 100%)",
-    text: "#ffd080",
-    textMuted: "rgba(255,208,128,0.65)",
-    accent: "#FF6F00",
+    bg: "linear-gradient(160deg,#1a0a00 0%,#3d1a00 50%,#1a0800 100%)",
+    text: "#ffe5b8",
+    textMuted: "rgba(255,208,128,0.6)",
+    accent: "#FFB347",
+    accentSoft: "rgba(255,179,71,0.12)",
     cardBg: "rgba(255,111,0,0.06)",
     cardBorder: "rgba(255,208,128,0.15)",
     rangoli: true,
@@ -73,6 +76,10 @@ const THEMES: Record<ThemeKey, ShareTheme> = {
   },
 };
 
+// Card dims — portrait, story-friendly, also fits IG feed (4:5)
+const CARD_W = 1080;
+const CARD_H = 1350;
+
 export function ShareYearDialog({ open, onClose, year }: Props) {
   const { logs, settings } = useStore();
   const [theme, setTheme] = useState<ThemeKey>("midnight");
@@ -84,7 +91,6 @@ export function ShareYearDialog({ open, onClose, year }: Props) {
   const months = monthLabels(grid);
   const t = THEMES[theme];
 
-  // Lock body scroll while open
   useEffect(() => {
     if (!open) return;
     const prev = document.body.style.overflow;
@@ -120,7 +126,6 @@ export function ShareYearDialog({ open, onClose, year }: Props) {
           return;
         }
       }
-      // Fallback download
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url; a.download = filename; a.click();
@@ -135,23 +140,41 @@ export function ShareYearDialog({ open, onClose, year }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex flex-col animate-fade-in">
+    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex flex-col animate-fade-in">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 text-white">
+      <div className="flex items-center justify-between px-4 pt-3 pb-2 text-white safe-top">
         <div className="text-sm font-semibold">Share your year</div>
-        <button onClick={onClose} className="p-2 -m-2 rounded-full hover:bg-white/10">
+        <button onClick={onClose} className="p-2 -m-2 rounded-full hover:bg-white/10 active:bg-white/20">
           <X className="w-5 h-5" />
         </button>
       </div>
 
-      {/* Preview area */}
+      {/* Theme switcher — top, easy reach */}
+      <div className="flex items-center gap-2 justify-center px-4 pb-3">
+        {(Object.keys(THEMES) as ThemeKey[]).map((k) => (
+          <button
+            key={k}
+            onClick={() => setTheme(k)}
+            className={`px-4 py-1.5 rounded-full text-xs font-semibold border transition active:scale-95 ${
+              theme === k ? "bg-white text-black border-white" : "text-white/80 border-white/25 hover:border-white/60"
+            }`}
+          >
+            {THEMES[k].name}
+          </button>
+        ))}
+      </div>
+
+      {/* Preview */}
       <div className="flex-1 overflow-auto px-4 flex items-start justify-center">
         <div
-          className="origin-top"
+          className="origin-top rounded-2xl overflow-hidden shadow-2xl"
           style={{
-            transform: "scale(var(--share-scale))",
-            // Scale to fit width on mobile
-            ['--share-scale' as any]: `min(1, calc((100vw - 32px) / 1080))`,
+            // Scale full-res 1080×1350 card down to fit viewport width
+            transform: `scale(min(1, calc((100vw - 32px) / ${CARD_W})))`,
+            transformOrigin: "top center",
+            width: CARD_W,
+            height: CARD_H,
+            flexShrink: 0,
           }}
         >
           <ShareCard
@@ -159,6 +182,7 @@ export function ShareYearDialog({ open, onClose, year }: Props) {
             theme={t}
             year={year}
             userName={settings.userName}
+            goal={settings.calorieGoal}
             stats={stats}
             grid={grid}
             months={months}
@@ -166,33 +190,20 @@ export function ShareYearDialog({ open, onClose, year }: Props) {
         </div>
       </div>
 
-      {/* Theme + actions */}
-      <div className="p-4 pb-6 space-y-3 bg-black/40 backdrop-blur-md safe-bottom">
-        <div className="flex items-center gap-2 justify-center">
-          {(Object.keys(THEMES) as ThemeKey[]).map((k) => (
-            <button
-              key={k}
-              onClick={() => setTheme(k)}
-              className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition ${
-                theme === k ? "bg-white text-black border-white" : "text-white border-white/30 hover:border-white/60"
-              }`}
-            >
-              {THEMES[k].name}
-            </button>
-          ))}
-        </div>
+      {/* Actions — sticky bottom, thumb-friendly */}
+      <div className="px-4 pt-3 pb-6 bg-gradient-to-t from-black via-black/80 to-transparent safe-bottom">
         <div className="flex gap-2 max-w-md mx-auto">
           <button
             disabled={busy}
             onClick={() => generate("download")}
-            className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-white/10 text-white font-semibold border border-white/15 hover:bg-white/15 disabled:opacity-50"
+            className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-white/10 text-white font-semibold border border-white/15 hover:bg-white/15 active:scale-95 transition disabled:opacity-50"
           >
             <Download className="w-4 h-4" /> Save
           </button>
           <button
             disabled={busy}
             onClick={() => generate("share")}
-            className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-gradient-to-r from-primary to-primary-glow text-primary-foreground font-semibold disabled:opacity-50"
+            className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-gradient-to-r from-primary to-primary-glow text-primary-foreground font-semibold active:scale-95 transition disabled:opacity-50 shadow-lg"
           >
             <Share2 className="w-4 h-4" /> {busy ? "Generating…" : "Share"}
           </button>
@@ -202,85 +213,96 @@ export function ShareYearDialog({ open, onClose, year }: Props) {
   );
 }
 
-/* ---------------- Share Card (1080×1080, fixed pixel layout) ---------------- */
+/* ---------------- Share Card (1080×1350 portrait) ---------------- */
 
 interface ShareCardProps {
   theme: ShareTheme;
   year: number;
   userName: string;
+  goal: number;
   stats: ReturnType<typeof computeYearStats>;
   grid: ReturnType<typeof buildYearGrid>;
   months: ReturnType<typeof monthLabels>;
 }
 
 const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
-  ({ theme: t, year, userName, stats, grid, months }, ref) => {
-    const SQ = 16; // bigger squares for share
+  ({ theme: t, year, userName, goal, stats, grid, months }, ref) => {
+    const SQ = 14;
     const GAP = 3;
     const colW = SQ + GAP;
     const gridW = 53 * colW - GAP;
+    const displayName = (userName || "").trim() || "Foodie";
 
     return (
       <div
         ref={ref}
         style={{
-          width: 1080,
-          height: 1080,
+          width: CARD_W,
+          height: CARD_H,
           background: t.bg,
           color: t.text,
-          fontFamily: "Inter, system-ui, sans-serif",
-          padding: 56,
+          fontFamily: "Inter, system-ui, -apple-system, sans-serif",
           position: "relative",
           boxSizing: "border-box",
           overflow: "hidden",
+          display: "flex",
+          flexDirection: "column",
+          padding: "72px 64px 56px",
         }}
       >
         {t.rangoli && <RangoliCorners color={t.accent} />}
 
-        {/* Header */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        {/* ---------- Top: Brand chip ---------- */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", zIndex: 2 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
             <div style={{
-              width: 44, height: 44, borderRadius: 12,
+              width: 52, height: 52, borderRadius: 14,
               background: `linear-gradient(135deg, ${t.accent}, #E65100)`,
               display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: 24,
+              fontSize: 28,
             }}>🍛</div>
             <div>
-              <div style={{ fontSize: 22, fontWeight: 800, letterSpacing: -0.3 }}>Thali</div>
-              <div style={{ fontSize: 12, color: t.textMuted, marginTop: 2 }}>Indian calorie tracker</div>
+              <div style={{ fontSize: 24, fontWeight: 800, letterSpacing: -0.4, lineHeight: 1 }}>Thali</div>
+              <div style={{ fontSize: 13, color: t.textMuted, marginTop: 4, fontWeight: 500 }}>Indian calorie tracker</div>
             </div>
           </div>
           <div style={{
-            fontSize: 12, fontWeight: 700, letterSpacing: 1.5,
-            color: t.accent, padding: "6px 12px", borderRadius: 999,
+            fontSize: 14, fontWeight: 800, letterSpacing: 2,
+            color: t.accent, padding: "8px 16px", borderRadius: 999,
+            background: t.accentSoft,
             border: `1px solid ${t.cardBorder}`,
           }}>
             {year}
           </div>
         </div>
 
-        {/* Title */}
-        <div style={{ marginTop: 56, textAlign: "center" }}>
-          <div style={{ fontSize: 14, color: t.textMuted, letterSpacing: 4, fontWeight: 600 }}>
-            MY YEAR IN CALORIES
+        {/* ---------- Title block ---------- */}
+        <div style={{ marginTop: 64, zIndex: 2 }}>
+          <div style={{ fontSize: 16, color: t.textMuted, letterSpacing: 6, fontWeight: 700, textTransform: "uppercase" }}>
+            My Year in Calories
           </div>
-          <div style={{ fontSize: 56, fontWeight: 900, marginTop: 8, letterSpacing: -1.5, lineHeight: 1 }}>
-            {userName ? userName : "A year of meals"}
+          <div style={{
+            fontSize: 88, fontWeight: 900, marginTop: 14, letterSpacing: -3, lineHeight: 0.95,
+          }}>
+            {displayName}
+          </div>
+          <div style={{ fontSize: 18, color: t.textMuted, marginTop: 14, fontWeight: 500 }}>
+            {goal.toLocaleString()} kcal/day goal
           </div>
         </div>
 
-        {/* Heatmap grid (centered) */}
+        {/* ---------- Heatmap card ---------- */}
         <div style={{
-          marginTop: 48,
-          padding: 32,
+          marginTop: 44,
+          padding: "32px 28px",
           background: t.cardBg,
           border: `1px solid ${t.cardBorder}`,
           borderRadius: 24,
           display: "flex", flexDirection: "column", alignItems: "center",
+          zIndex: 2,
         }}>
           {/* month labels */}
-          <div style={{ display: "flex", width: gridW, marginBottom: 6, paddingLeft: 0 }}>
+          <div style={{ display: "flex", width: gridW, marginBottom: 8 }}>
             {grid.map((_, i) => {
               const m = months.find((mm) => mm.col === i);
               return (
@@ -310,28 +332,50 @@ const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
               </div>
             ))}
           </div>
-        </div>
 
-        {/* Stats row */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16, marginTop: 32 }}>
-          <ShareStat t={t} icon="🔥" value={`${stats.streak}`} label="day streak" />
-          <ShareStat t={t} icon="📅" value={`${stats.loggedDays}`} label="days logged" />
-          <ShareStat t={t} icon="🎯" value={`${stats.onGoalPct}%`} label="on goal" />
-        </div>
-
-        {/* Legend + footer */}
-        <div style={{
-          position: "absolute", left: 56, right: 56, bottom: 40,
-          display: "flex", alignItems: "center", justifyContent: "space-between",
-        }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 14, fontSize: 11, color: t.textMuted }}>
+          {/* Legend inline below grid */}
+          <div style={{
+            display: "flex", alignItems: "center", justifyContent: "center", gap: 18,
+            marginTop: 20, fontSize: 12, color: t.textMuted, fontWeight: 600,
+          }}>
             <LegendChip c={t.palette.under[2]} label="Under" t={t} />
             <LegendChip c={t.palette.on_track[3]} label="On goal" t={t} />
             <LegendChip c={t.palette.over[2]} label="Over" t={t} />
             <LegendChip c={t.palette.way_over[2]} label="Cheat" t={t} />
           </div>
-          <div style={{ fontSize: 11, color: t.textMuted, fontWeight: 600 }}>
-            Tracked with Thali · IFCT 2017 🇮🇳
+        </div>
+
+        {/* ---------- Stats grid (2×2, big numbers) ---------- */}
+        <div style={{
+          display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginTop: 28, zIndex: 2,
+        }}>
+          <ShareStat t={t} label="Current streak" value={`${stats.streak}`} unit="days" />
+          <ShareStat t={t} label="Days logged" value={`${stats.loggedDays}`} unit={`/ ${stats.totalDays}`} />
+          <ShareStat t={t} label="On goal" value={`${stats.onGoalPct}%`} unit="of days" />
+          <ShareStat
+            t={t}
+            label="Best day"
+            value={stats.bestDay ? stats.bestDay.kcal.toLocaleString() : "—"}
+            unit={stats.bestDay ? `kcal · ${format(parseISO(stats.bestDay.date), "MMM d")}` : "no data"}
+          />
+        </div>
+
+        {/* ---------- Footer ---------- */}
+        <div style={{
+          marginTop: "auto", paddingTop: 28,
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+          borderTop: `1px solid ${t.cardBorder}`,
+          zIndex: 2,
+        }}>
+          <div style={{ fontSize: 13, color: t.textMuted, fontWeight: 600, lineHeight: 1.4 }}>
+            Tracked with <span style={{ color: t.text, fontWeight: 800 }}>Thali</span> 🍛<br/>
+            <span style={{ fontSize: 11, opacity: 0.75 }}>Powered by IFCT 2017 · NIN, Hyderabad 🇮🇳</span>
+          </div>
+          <div style={{
+            fontSize: 11, color: t.textMuted, fontWeight: 700, letterSpacing: 1.5,
+            padding: "6px 12px", borderRadius: 8, border: `1px solid ${t.cardBorder}`,
+          }}>
+            mythali.app
           </div>
         </div>
       </div>
@@ -340,18 +384,26 @@ const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
 );
 ShareCard.displayName = "ShareCard";
 
-function ShareStat({ t, icon, value, label }: { t: ShareTheme; icon: string; value: string; label: string }) {
+function ShareStat({ t, label, value, unit }: { t: ShareTheme; label: string; value: string; unit: string }) {
   return (
     <div style={{
       background: t.cardBg, border: `1px solid ${t.cardBorder}`,
-      borderRadius: 16, padding: "20px 24px",
+      borderRadius: 18, padding: "20px 22px",
     }}>
-      <div style={{ fontSize: 18 }}>{icon}</div>
-      <div style={{ fontSize: 38, fontWeight: 900, color: t.accent, lineHeight: 1.1, marginTop: 4, letterSpacing: -1 }}>
+      <div style={{
+        fontSize: 11, color: t.textMuted, fontWeight: 700,
+        letterSpacing: 1.2, textTransform: "uppercase",
+      }}>
+        {label}
+      </div>
+      <div style={{
+        fontSize: 44, fontWeight: 900, color: t.accent,
+        lineHeight: 1.05, marginTop: 8, letterSpacing: -1.5,
+      }}>
         {value}
       </div>
-      <div style={{ fontSize: 12, color: t.textMuted, marginTop: 4, fontWeight: 600, letterSpacing: 0.5 }}>
-        {label.toUpperCase()}
+      <div style={{ fontSize: 12, color: t.textMuted, marginTop: 4, fontWeight: 600 }}>
+        {unit}
       </div>
     </div>
   );
@@ -360,7 +412,7 @@ function ShareStat({ t, icon, value, label }: { t: ShareTheme; icon: string; val
 function LegendChip({ c, label, t }: { c: string; label: string; t: ShareTheme }) {
   return (
     <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-      <span style={{ width: 10, height: 10, borderRadius: 2, background: c, display: "inline-block" }} />
+      <span style={{ width: 11, height: 11, borderRadius: 3, background: c, display: "inline-block" }} />
       <span style={{ color: t.textMuted }}>{label}</span>
     </span>
   );
@@ -368,31 +420,31 @@ function LegendChip({ c, label, t }: { c: string; label: string; t: ShareTheme }
 
 function RangoliCorners({ color }: { color: string }) {
   const corner = (
-    <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
-      <g stroke={color} strokeWidth="1.2" opacity="0.35" fill="none">
-        <circle cx="60" cy="60" r="50" />
-        <circle cx="60" cy="60" r="36" />
-        <circle cx="60" cy="60" r="22" />
-        <circle cx="60" cy="60" r="8" />
+    <svg width="160" height="160" viewBox="0 0 160 160" fill="none">
+      <g stroke={color} strokeWidth="1.2" opacity="0.28" fill="none">
+        <circle cx="80" cy="80" r="68" />
+        <circle cx="80" cy="80" r="50" />
+        <circle cx="80" cy="80" r="32" />
+        <circle cx="80" cy="80" r="14" />
         {Array.from({ length: 12 }).map((_, i) => {
           const a = (i / 12) * Math.PI * 2;
-          return <line key={i} x1={60} y1={60} x2={60 + Math.cos(a) * 50} y2={60 + Math.sin(a) * 50} />;
+          return <line key={i} x1={80} y1={80} x2={80 + Math.cos(a) * 68} y2={80 + Math.sin(a) * 68} />;
         })}
       </g>
-      <g fill={color} opacity="0.5">
+      <g fill={color} opacity="0.4">
         {Array.from({ length: 8 }).map((_, i) => {
           const a = (i / 8) * Math.PI * 2;
-          return <circle key={i} cx={60 + Math.cos(a) * 36} cy={60 + Math.sin(a) * 36} r="2" />;
+          return <circle key={i} cx={80 + Math.cos(a) * 50} cy={80 + Math.sin(a) * 50} r="2.5" />;
         })}
       </g>
     </svg>
   );
   return (
     <>
-      <div style={{ position: "absolute", top: -30, left: -30 }}>{corner}</div>
-      <div style={{ position: "absolute", top: -30, right: -30, transform: "scaleX(-1)" }}>{corner}</div>
-      <div style={{ position: "absolute", bottom: -30, left: -30, transform: "scaleY(-1)" }}>{corner}</div>
-      <div style={{ position: "absolute", bottom: -30, right: -30, transform: "scale(-1,-1)" }}>{corner}</div>
+      <div style={{ position: "absolute", top: -50, left: -50, zIndex: 1 }}>{corner}</div>
+      <div style={{ position: "absolute", top: -50, right: -50, transform: "scaleX(-1)", zIndex: 1 }}>{corner}</div>
+      <div style={{ position: "absolute", bottom: -50, left: -50, transform: "scaleY(-1)", zIndex: 1 }}>{corner}</div>
+      <div style={{ position: "absolute", bottom: -50, right: -50, transform: "scale(-1,-1)", zIndex: 1 }}>{corner}</div>
     </>
   );
 }
