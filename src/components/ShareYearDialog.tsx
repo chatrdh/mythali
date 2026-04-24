@@ -1,7 +1,7 @@
-import { forwardRef, useEffect, useRef, useState } from "react";
+import { forwardRef, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { format, parseISO } from "date-fns";
 import html2canvas from "html2canvas";
-import { Download, Share2, X } from "lucide-react";
+import { Download, X } from "lucide-react";
 import { useStore } from "@/store/useStore";
 import {
   buildYearGrid, computeYearStats, monthLabels, colorFor, isToday,
@@ -11,11 +11,7 @@ import { toast } from "sonner";
 
 interface Props { open: boolean; onClose: () => void; year: number }
 
-type ThemeKey = "midnight" | "saffron";
-
 interface ShareTheme {
-  key: ThemeKey;
-  name: string;
   bg: string;
   text: string;
   textMuted: string;
@@ -24,55 +20,26 @@ interface ShareTheme {
   cardBg: string;
   cardBorder: string;
   palette: HeatmapPalette;
-  rangoli: boolean;
 }
 
-const THEMES: Record<ThemeKey, ShareTheme> = {
-  midnight: {
-    key: "midnight",
-    name: "Midnight",
-    bg: "linear-gradient(160deg,#0a0a0f 0%,#16162a 50%,#0d1117 100%)",
-    text: "#ffffff",
-    textMuted: "rgba(255,255,255,0.55)",
-    accent: "#FF6F00",
-    accentSoft: "rgba(255,111,0,0.12)",
-    cardBg: "rgba(255,255,255,0.04)",
-    cardBorder: "rgba(255,255,255,0.08)",
-    rangoli: false,
-    palette: {
-      empty: "#161b22",
-      outOfYear: "#0d1117",
-      under:    { 1: "#0d2a3d", 2: "#1a4a6b", 3: "#2196F3" },
-      light:    { 1: "#0d2a3d", 2: "#1a4a6b", 3: "#42a5f5" },
-      on_track: { 1: "#2d6a3f", 2: "#388e3c", 3: "#4CAF50" },
-      over:     { 1: "#cc7a00", 2: "#FF9800", 3: "#ffb74d" },
-      big_over: { 1: "#c62828", 2: "#E53935", 3: "#ef5350" },
-      way_over: { 1: "#8b1a1a", 2: "#b71c1c", 3: "#7f0000" },
-      todayBorder: "rgba(255,255,255,0.7)",
-    },
-  },
-  saffron: {
-    key: "saffron",
-    name: "Saffron",
-    bg: "linear-gradient(160deg,#1a0a00 0%,#3d1a00 50%,#1a0800 100%)",
-    text: "#ffe5b8",
-    textMuted: "rgba(255,208,128,0.6)",
-    accent: "#FFB347",
-    accentSoft: "rgba(255,179,71,0.12)",
-    cardBg: "rgba(255,111,0,0.06)",
-    cardBorder: "rgba(255,208,128,0.15)",
-    rangoli: true,
-    palette: {
-      empty: "#2a1200",
-      outOfYear: "#1a0800",
-      under:    { 1: "#3d2510", 2: "#7a4a1a", 3: "#d99020" },
-      light:    { 1: "#3d2510", 2: "#7a4a1a", 3: "#e8a040" },
-      on_track: { 1: "#3d5a1f", 2: "#6b8e2f", 3: "#a8c43f" },
-      over:     { 1: "#cc6600", 2: "#FF8800", 3: "#ffaa44" },
-      big_over: { 1: "#a02020", 2: "#d83030", 3: "#ff5050" },
-      way_over: { 1: "#700000", 2: "#9a0000", 3: "#5a0000" },
-      todayBorder: "rgba(255,208,128,0.85)",
-    },
+const MIDNIGHT: ShareTheme = {
+  bg: "linear-gradient(160deg,#0a0a0f 0%,#16162a 50%,#0d1117 100%)",
+  text: "#ffffff",
+  textMuted: "rgba(255,255,255,0.55)",
+  accent: "#FF6F00",
+  accentSoft: "rgba(255,111,0,0.12)",
+  cardBg: "rgba(255,255,255,0.04)",
+  cardBorder: "rgba(255,255,255,0.08)",
+  palette: {
+    empty: "#161b22",
+    outOfYear: "#0d1117",
+    under:    { 1: "#0d2a3d", 2: "#1a4a6b", 3: "#2196F3" },
+    light:    { 1: "#0d2a3d", 2: "#1a4a6b", 3: "#42a5f5" },
+    on_track: { 1: "#2d6a3f", 2: "#388e3c", 3: "#4CAF50" },
+    over:     { 1: "#cc7a00", 2: "#FF9800", 3: "#ffb74d" },
+    big_over: { 1: "#c62828", 2: "#E53935", 3: "#ef5350" },
+    way_over: { 1: "#8b1a1a", 2: "#b71c1c", 3: "#7f0000" },
+    todayBorder: "rgba(255,255,255,0.7)",
   },
 };
 
@@ -82,14 +49,14 @@ const CARD_H = 1350;
 
 export function ShareYearDialog({ open, onClose, year }: Props) {
   const { logs, settings } = useStore();
-  const [theme, setTheme] = useState<ThemeKey>("midnight");
   const [busy, setBusy] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
+  const previewWrapRef = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(1);
 
   const grid = buildYearGrid(logs, settings.calorieGoal, year);
   const stats = computeYearStats(grid);
   const months = monthLabels(grid);
-  const t = THEMES[theme];
 
   useEffect(() => {
     if (!open) return;
@@ -98,9 +65,26 @@ export function ShareYearDialog({ open, onClose, year }: Props) {
     return () => { document.body.style.overflow = prev; };
   }, [open]);
 
+  // Measure available preview width and scale the 1080×1350 card to fit
+  useLayoutEffect(() => {
+    if (!open) return;
+    const compute = () => {
+      const el = previewWrapRef.current;
+      if (!el) return;
+      const w = el.clientWidth;
+      const h = el.clientHeight;
+      if (!w || !h) return;
+      const s = Math.min(w / CARD_W, h / CARD_H, 1);
+      setScale(s);
+    };
+    compute();
+    window.addEventListener("resize", compute);
+    return () => window.removeEventListener("resize", compute);
+  }, [open]);
+
   if (!open) return null;
 
-  const generate = async (action: "share" | "download") => {
+  const download = async () => {
     if (!cardRef.current) return;
     setBusy(true);
     try {
@@ -114,18 +98,6 @@ export function ShareYearDialog({ open, onClose, year }: Props) {
         canvas.toBlob((b) => (b ? resolve(b) : reject(new Error("blob failed"))), "image/png"),
       );
       const filename = `thali-year-${year}.png`;
-      if (action === "share" && (navigator as any).canShare) {
-        const file = new File([blob], filename, { type: "image/png" });
-        if ((navigator as any).canShare({ files: [file] })) {
-          await (navigator as any).share({
-            title: `My Year in Calories ${year}`,
-            text: `${stats.loggedDays} days logged · ${stats.streak}-day streak · ${stats.onGoalPct}% on goal. Tracked with Thali 🍛`,
-            files: [file],
-          });
-          setBusy(false);
-          return;
-        }
-      }
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url; a.download = filename; a.click();
@@ -140,7 +112,7 @@ export function ShareYearDialog({ open, onClose, year }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex flex-col animate-fade-in">
+    <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex flex-col animate-fade-in">
       {/* Header */}
       <div className="flex items-center justify-between px-4 pt-3 pb-2 text-white safe-top">
         <div className="text-sm font-semibold">Share your year</div>
@@ -149,65 +121,52 @@ export function ShareYearDialog({ open, onClose, year }: Props) {
         </button>
       </div>
 
-      {/* Theme switcher — top, easy reach */}
-      <div className="flex items-center gap-2 justify-center px-4 pb-3">
-        {(Object.keys(THEMES) as ThemeKey[]).map((k) => (
-          <button
-            key={k}
-            onClick={() => setTheme(k)}
-            className={`px-4 py-1.5 rounded-full text-xs font-semibold border transition active:scale-95 ${
-              theme === k ? "bg-white text-black border-white" : "text-white/80 border-white/25 hover:border-white/60"
-            }`}
-          >
-            {THEMES[k].name}
-          </button>
-        ))}
-      </div>
-
-      {/* Preview */}
-      <div className="flex-1 overflow-auto px-4 flex items-start justify-center">
+      {/* Preview — fills available space, card is scaled to fit */}
+      <div
+        ref={previewWrapRef}
+        className="flex-1 min-h-0 px-4 py-3 flex items-center justify-center overflow-hidden"
+      >
         <div
-          className="origin-top rounded-2xl overflow-hidden shadow-2xl"
           style={{
-            // Scale full-res 1080×1350 card down to fit viewport width
-            transform: `scale(min(1, calc((100vw - 32px) / ${CARD_W})))`,
-            transformOrigin: "top center",
-            width: CARD_W,
-            height: CARD_H,
-            flexShrink: 0,
+            width: CARD_W * scale,
+            height: CARD_H * scale,
+            position: "relative",
           }}
         >
-          <ShareCard
-            ref={cardRef}
-            theme={t}
-            year={year}
-            userName={settings.userName}
-            goal={settings.calorieGoal}
-            stats={stats}
-            grid={grid}
-            months={months}
-          />
+          <div
+            style={{
+              width: CARD_W,
+              height: CARD_H,
+              transform: `scale(${scale})`,
+              transformOrigin: "top left",
+              borderRadius: 24 / scale,
+              overflow: "hidden",
+              boxShadow: "0 25px 60px -15px rgba(0,0,0,0.7)",
+            }}
+          >
+            <ShareCard
+              ref={cardRef}
+              theme={MIDNIGHT}
+              year={year}
+              userName={settings.userName}
+              goal={settings.calorieGoal}
+              stats={stats}
+              grid={grid}
+              months={months}
+            />
+          </div>
         </div>
       </div>
 
       {/* Actions — sticky bottom, thumb-friendly */}
-      <div className="px-4 pt-3 pb-6 bg-gradient-to-t from-black via-black/80 to-transparent safe-bottom">
-        <div className="flex gap-2 max-w-md mx-auto">
-          <button
-            disabled={busy}
-            onClick={() => generate("download")}
-            className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-white/10 text-white font-semibold border border-white/15 hover:bg-white/15 active:scale-95 transition disabled:opacity-50"
-          >
-            <Download className="w-4 h-4" /> Save
-          </button>
-          <button
-            disabled={busy}
-            onClick={() => generate("share")}
-            className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-gradient-to-r from-primary to-primary-glow text-primary-foreground font-semibold active:scale-95 transition disabled:opacity-50 shadow-lg"
-          >
-            <Share2 className="w-4 h-4" /> {busy ? "Generating…" : "Share"}
-          </button>
-        </div>
+      <div className="px-4 pt-3 pb-6 bg-gradient-to-t from-black via-black/90 to-transparent safe-bottom">
+        <button
+          disabled={busy}
+          onClick={download}
+          className="w-full max-w-md mx-auto flex items-center justify-center gap-2 py-4 rounded-2xl bg-gradient-to-r from-primary to-primary-glow text-primary-foreground font-semibold active:scale-[0.98] transition disabled:opacity-50 shadow-lg"
+        >
+          <Download className="w-5 h-5" /> {busy ? "Generating…" : "Save image"}
+        </button>
       </div>
     </div>
   );
@@ -250,8 +209,6 @@ const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
           padding: "72px 64px 56px",
         }}
       >
-        {t.rangoli && <RangoliCorners color={t.accent} />}
-
         {/* ---------- Top: Brand chip ---------- */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", zIndex: 2 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
@@ -415,36 +372,5 @@ function LegendChip({ c, label, t }: { c: string; label: string; t: ShareTheme }
       <span style={{ width: 11, height: 11, borderRadius: 3, background: c, display: "inline-block" }} />
       <span style={{ color: t.textMuted }}>{label}</span>
     </span>
-  );
-}
-
-function RangoliCorners({ color }: { color: string }) {
-  const corner = (
-    <svg width="160" height="160" viewBox="0 0 160 160" fill="none">
-      <g stroke={color} strokeWidth="1.2" opacity="0.28" fill="none">
-        <circle cx="80" cy="80" r="68" />
-        <circle cx="80" cy="80" r="50" />
-        <circle cx="80" cy="80" r="32" />
-        <circle cx="80" cy="80" r="14" />
-        {Array.from({ length: 12 }).map((_, i) => {
-          const a = (i / 12) * Math.PI * 2;
-          return <line key={i} x1={80} y1={80} x2={80 + Math.cos(a) * 68} y2={80 + Math.sin(a) * 68} />;
-        })}
-      </g>
-      <g fill={color} opacity="0.4">
-        {Array.from({ length: 8 }).map((_, i) => {
-          const a = (i / 8) * Math.PI * 2;
-          return <circle key={i} cx={80 + Math.cos(a) * 50} cy={80 + Math.sin(a) * 50} r="2.5" />;
-        })}
-      </g>
-    </svg>
-  );
-  return (
-    <>
-      <div style={{ position: "absolute", top: -50, left: -50, zIndex: 1 }}>{corner}</div>
-      <div style={{ position: "absolute", top: -50, right: -50, transform: "scaleX(-1)", zIndex: 1 }}>{corner}</div>
-      <div style={{ position: "absolute", bottom: -50, left: -50, transform: "scaleY(-1)", zIndex: 1 }}>{corner}</div>
-      <div style={{ position: "absolute", bottom: -50, right: -50, transform: "scale(-1,-1)", zIndex: 1 }}>{corner}</div>
-    </>
   );
 }
