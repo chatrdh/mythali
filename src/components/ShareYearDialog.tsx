@@ -186,8 +186,8 @@ interface ShareCardProps {
 
 const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
   ({ theme: t, year, userName, goal, stats, grid, months }, ref) => {
-    const SQ = 14;
-    const GAP = 3;
+    const SQ = 18;
+    const GAP = 4;
     const colW = SQ + GAP;
     const gridW = 53 * colW - GAP;
     const displayName = (userName || "").trim() || "Foodie";
