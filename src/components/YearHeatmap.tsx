@@ -81,28 +81,28 @@ export function YearHeatmap() {
       {/* Grid */}
       <div className="overflow-x-auto no-scrollbar -mx-2 px-2">
         <div className="inline-block min-w-full">
-          {/* Month labels */}
-          <div className="flex pl-7 mb-1 select-none">
+          {/* Month labels — aligned with grid columns (each col = 14px: 12 square + 2 gap) */}
+          <div className="flex mb-1 select-none" style={{ paddingLeft: 24 /* day-label col 20 + gap 4 */ }}>
             {grid.map((_, i) => {
               const m = months.find((mm) => mm.col === i);
               return (
-                <div key={i} style={{ width: 12, marginRight: 2 }} className="text-[10px] text-muted-foreground font-medium">
+                <div key={i} style={{ width: 14 }} className="text-[10px] text-muted-foreground font-medium">
                   {m?.label ?? ""}
                 </div>
               );
             })}
           </div>
-          <div className="flex gap-[2px]">
-            {/* Day labels */}
-            <div className="flex flex-col gap-[2px] mr-1 w-5 select-none">
+          <div className="flex" style={{ gap: 2 }}>
+            {/* Day labels — match grid cell height (12) + gap (2) = 14 */}
+            <div className="flex flex-col select-none" style={{ width: 20, marginRight: 2, gap: 2 }}>
               {["Mon", "", "Wed", "", "Fri", "", ""].map((d, i) => (
-                <div key={i} style={{ height: 12 }} className="text-[10px] text-muted-foreground leading-3">
+                <div key={i} style={{ height: 12, lineHeight: "12px" }} className="text-[10px] text-muted-foreground">
                   {d}
                 </div>
               ))}
             </div>
             {grid.map((col, ci) => (
-              <div key={ci} className="flex flex-col gap-[2px]">
+              <div key={ci} className="flex flex-col" style={{ gap: 2 }}>
                 {col.map((cell) => {
                   const today = isToday(cell.date);
                   return (
