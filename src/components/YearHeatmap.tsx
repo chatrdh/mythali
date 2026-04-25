@@ -91,53 +91,60 @@ export function YearHeatmap() {
         />
       </div>
 
-      {/* Grid — bigger cells for clarity */}
-      <div ref={scrollRef} className="overflow-x-auto no-scrollbar -mx-2 px-2">
-        <div className="inline-block min-w-full">
-          {/* Month labels — aligned with grid columns (each col = 16 + 3 gap = 19px) */}
-          <div className="flex mb-1.5 select-none" style={{ paddingLeft: 30 /* day-label col 26 + gap 4 */ }}>
-            {grid.map((_, i) => {
-              const m = months.find((mm) => mm.col === i);
-              return (
-                <div key={i} style={{ width: 19 }} className="text-[11px] text-muted-foreground font-medium">
-                  {m?.label ?? ""}
-                </div>
-              );
-            })}
-          </div>
-          <div className="flex" style={{ gap: 3 }}>
-            {/* Day labels — match grid cell height (16) + gap (3) = 19 */}
-            <div className="flex flex-col select-none" style={{ width: 26, marginRight: 1, gap: 3 }}>
-              {["Mon", "", "Wed", "", "Fri", "", ""].map((d, i) => (
-                <div key={i} style={{ height: 16, lineHeight: "16px" }} className="text-[11px] text-muted-foreground">
-                  {d}
+      {/* Grid — sticky day labels on the left, horizontally-scrolling weeks on the right */}
+      <div className="flex">
+        {/* Sticky day-of-week labels — match grid cell height (16) + gap (3) = 19 */}
+        <div
+          className="flex flex-col select-none flex-shrink-0 pt-[22px]"
+          style={{ width: 26, marginRight: 4, gap: 3 }}
+        >
+          {["Mon", "", "Wed", "", "Fri", "", ""].map((d, i) => (
+            <div key={i} style={{ height: 16, lineHeight: "16px" }} className="text-[11px] text-muted-foreground">
+              {d}
+            </div>
+          ))}
+        </div>
+
+        {/* Scrollable area: month labels + week columns */}
+        <div ref={scrollRef} className="flex-1 overflow-x-auto no-scrollbar">
+          <div className="inline-block">
+            {/* Month labels — aligned with grid columns (each col = 16 + 3 gap = 19px) */}
+            <div className="flex mb-1.5 select-none" style={{ height: 16 }}>
+              {grid.map((_, i) => {
+                const m = months.find((mm) => mm.col === i);
+                return (
+                  <div key={i} style={{ width: 19 }} className="text-[11px] text-muted-foreground font-medium">
+                    {m?.label ?? ""}
+                  </div>
+                );
+              })}
+            </div>
+            <div className="flex" style={{ gap: 3 }}>
+              {grid.map((col, ci) => (
+                <div key={ci} className="flex flex-col" style={{ gap: 3 }}>
+                  {col.map((cell) => {
+                    const today = isToday(cell.date);
+                    return (
+                      <div
+                        key={cell.key}
+                        onMouseEnter={(e) => cell.inYear && setHover({ cell, x: e.clientX, y: e.clientY })}
+                        onMouseMove={(e) => cell.inYear && setHover({ cell, x: e.clientX, y: e.clientY })}
+                        onMouseLeave={() => setHover(null)}
+                        onClick={(e) => cell.inYear && setHover({ cell, x: e.clientX, y: e.clientY })}
+                        className="rounded-[3px] transition-transform hover:scale-150 cursor-pointer"
+                        style={{
+                          width: 16,
+                          height: 16,
+                          background: colorFor(cell, palette),
+                          boxShadow: today ? `inset 0 0 0 1.5px ${palette.todayBorder}` : undefined,
+                          opacity: cell.inYear ? 1 : 0.35,
+                        }}
+                      />
+                    );
+                  })}
                 </div>
               ))}
             </div>
-            {grid.map((col, ci) => (
-              <div key={ci} className="flex flex-col" style={{ gap: 3 }}>
-                {col.map((cell) => {
-                  const today = isToday(cell.date);
-                  return (
-                    <div
-                      key={cell.key}
-                      onMouseEnter={(e) => cell.inYear && setHover({ cell, x: e.clientX, y: e.clientY })}
-                      onMouseMove={(e) => cell.inYear && setHover({ cell, x: e.clientX, y: e.clientY })}
-                      onMouseLeave={() => setHover(null)}
-                      onClick={(e) => cell.inYear && setHover({ cell, x: e.clientX, y: e.clientY })}
-                      className="rounded-[3px] transition-transform hover:scale-150 cursor-pointer"
-                      style={{
-                        width: 16,
-                        height: 16,
-                        background: colorFor(cell, palette),
-                        boxShadow: today ? `inset 0 0 0 1.5px ${palette.todayBorder}` : undefined,
-                        opacity: cell.inYear ? 1 : 0.35,
-                      }}
-                    />
-                  );
-                })}
-              </div>
-            ))}
           </div>
         </div>
       </div>
