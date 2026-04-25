@@ -76,6 +76,15 @@ export const SearchSheet = ({ open, onClose, defaultMeal, onAddCustom }: Props) 
       .filter(Boolean) as FoodItem[];
   }, [logs, allFoods]);
 
+  const isUnitFood = !!selected && !!selected.servingUnit && selected.servingUnit !== "g";
+  const unitLabel = isUnitFood ? `${selected!.servingUnit}${qty === 1 ? "" : "s"}` : "grams";
+
+  // Reset qty whenever a new food is picked so unit foods default to 1, gram foods to 100.
+  const pickFood = (f: FoodItem) => {
+    setSelected(f);
+    setQty(f.servingUnit && f.servingUnit !== "g" ? 1 : 100);
+  };
+
   const handleAdd = () => {
     if (!selected) return;
     const n = calcNutrition(selected, qty);
