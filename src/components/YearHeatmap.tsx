@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { format, parseISO } from "date-fns";
 import { Flame, Calendar, Target, Zap, Share2 } from "lucide-react";
 import { useStore } from "@/store/useStore";
@@ -21,6 +21,7 @@ export function YearHeatmap() {
   const [year, setYear] = useState(new Date().getFullYear());
   const [hover, setHover] = useState<{ cell: DayCell; x: number; y: number } | null>(null);
   const [shareOpen, setShareOpen] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   const isDark = settings.darkMode;
   const palette = PALETTES[isDark ? "dark" : "light"];
@@ -38,6 +39,16 @@ export function YearHeatmap() {
     logs.forEach((l) => ys.add(parseISO(l.date).getFullYear()));
     return [...ys].sort((a, b) => b - a);
   }, [logs]);
+
+  // Auto-scroll to the right so the current week & month are in focus on mount/year change
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    // Defer to next frame to ensure layout is computed
+    requestAnimationFrame(() => {
+      el.scrollTo({ left: el.scrollWidth, behavior: "auto" });
+    });
+  }, [year, grid]);
 
   return (
     <div className="rounded-2xl bg-card shadow-card p-4 border border-border/50 space-y-4">
@@ -81,7 +92,7 @@ export function YearHeatmap() {
       </div>
 
       {/* Grid — bigger cells for clarity */}
-      <div className="overflow-x-auto no-scrollbar -mx-2 px-2">
+      <div ref={scrollRef} className="overflow-x-auto no-scrollbar -mx-2 px-2">
         <div className="inline-block min-w-full">
           {/* Month labels — aligned with grid columns (each col = 16 + 3 gap = 19px) */}
           <div className="flex mb-1.5 select-none" style={{ paddingLeft: 30 /* day-label col 26 + gap 4 */ }}>
