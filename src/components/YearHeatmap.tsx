@@ -40,6 +40,16 @@ export function YearHeatmap() {
     return [...ys].sort((a, b) => b - a);
   }, [logs]);
 
+  // Auto-scroll to the right so the current week & month are in focus on mount/year change
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    // Defer to next frame to ensure layout is computed
+    requestAnimationFrame(() => {
+      el.scrollTo({ left: el.scrollWidth, behavior: "auto" });
+    });
+  }, [year, grid]);
+
   return (
     <div className="rounded-2xl bg-card shadow-card p-4 border border-border/50 space-y-4">
       <div className="flex items-center justify-between">
