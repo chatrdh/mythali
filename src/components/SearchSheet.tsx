@@ -160,8 +160,8 @@ export const SearchSheet = ({ open, onClose, defaultMeal, onAddCustom }: Props) 
         <div className="flex-1 overflow-y-auto px-2 pb-4">
           {!query && category === "All" && (recent.length > 0 || frequent.length > 0) && (
             <div className="space-y-3 px-2 py-2">
-              {recent.length > 0 && <HorizRow title="🕐 Recently logged" items={recent} onPick={setSelected} />}
-              {frequent.length > 0 && <HorizRow title="⭐ Most frequent" items={frequent} onPick={setSelected} />}
+              {recent.length > 0 && <HorizRow title="🕐 Recently logged" items={recent} onPick={pickFood} />}
+              {frequent.length > 0 && <HorizRow title="⭐ Most frequent" items={frequent} onPick={pickFood} />}
             </div>
           )}
 
