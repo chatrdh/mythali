@@ -44,12 +44,12 @@ export const CustomFoodSheet = ({ open, onClose }: Props) => {
       return;
     }
     // For grams: normalize to per-100g basis (existing behavior).
-    // For non-gram units: store macros as entered for the given count of units; treat 1 portion (= entered count) as 100 "units"
-    // so logging this food gives the entered values for one serving.
-    const factor = unitMode === "g" ? 100 / serving : 1;
-    const displayName = unitMode === "g"
+    // For non-gram units: store macros as entered (totals for `serving` units) and tag with servingUnit/servingSize.
+    const isGram = unitMode === "g";
+    const factor = isGram ? 100 / serving : 1;
+    const displayName = isGram
       ? name.trim()
-      : `${name.trim()} (per ${serving} ${otherUnit}${serving > 1 ? "s" : ""})`;
+      : `${name.trim()} (per 1 ${otherUnit})`;
 
     addCustomFood({
       id: `C-${Date.now()}`, code: `C${Date.now()}`,
@@ -58,6 +58,8 @@ export const CustomFoodSheet = ({ open, onClose }: Props) => {
       moisture: 0, protein: p * factor, fat: fat * factor, fibre: fi * factor,
       carbs: c * factor, energyKj: cal * 4.184 * factor, calories: cal * factor,
       isCustom: true,
+      servingUnit: isGram ? "g" : otherUnit,
+      servingSize: isGram ? 100 : serving,
     });
     toast.success("Custom food saved");
     onClose();
