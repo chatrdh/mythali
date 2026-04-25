@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Settings, Plus } from "lucide-react";
+import { Settings, Plus, Sun, Moon } from "lucide-react";
 import { Link } from "react-router-dom";
 import { CalorieRing } from "@/components/CalorieRing";
 import { MacroPillRow } from "@/components/MacroPillRow";
@@ -12,7 +12,7 @@ import { format } from "date-fns";
 const MEALS: MealType[] = ["BREAKFAST", "LUNCH", "DINNER", "SNACKS"];
 
 export default function Home() {
-  const { logs, settings } = useStore();
+  const { logs, settings, updateSettings } = useStore();
   const [sheet, setSheet] = useState<{ open: boolean; meal: MealType }>({ open: false, meal: mealForTime() });
   const [customOpen, setCustomOpen] = useState(false);
 
@@ -38,9 +38,22 @@ export default function Home() {
           <h1 className="text-lg font-bold">{greeting}</h1>
           <p className="text-xs text-muted-foreground">{format(new Date(), "EEEE, d MMMM")}</p>
         </div>
-        <Link to="/settings" className="p-2 rounded-full hover:bg-muted transition" aria-label="Settings">
-          <Settings className="w-5 h-5" />
-        </Link>
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => updateSettings({ darkMode: !settings.darkMode })}
+            className="p-2 rounded-full hover:bg-muted transition"
+            aria-label="Toggle dark mode"
+          >
+            {settings.darkMode ? (
+              <Sun className="w-5 h-5" />
+            ) : (
+              <Moon className="w-5 h-5" />
+            )}
+          </button>
+          <Link to="/settings" className="p-2 rounded-full hover:bg-muted transition" aria-label="Settings">
+            <Settings className="w-5 h-5" />
+          </Link>
+        </div>
       </header>
 
       <section className="flex justify-center py-3">
