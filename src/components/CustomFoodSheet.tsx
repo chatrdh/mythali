@@ -6,11 +6,24 @@ import { toast } from "sonner";
 
 interface Props { open: boolean; onClose: () => void; }
 
+type ServingUnit = "g" | "piece" | "bowl" | "cup" | "serving" | "slice" | "tbsp";
+
+const UNIT_OPTIONS: { value: ServingUnit; label: string }[] = [
+  { value: "piece",   label: "piece" },
+  { value: "bowl",    label: "bowl" },
+  { value: "cup",     label: "cup" },
+  { value: "serving", label: "serving" },
+  { value: "slice",   label: "slice" },
+  { value: "tbsp",    label: "tbsp" },
+];
+
 export const CustomFoodSheet = ({ open, onClose }: Props) => {
   const addCustomFood = useStore((s) => s.addCustomFood);
   const [name, setName] = useState("");
   const [regional, setRegional] = useState("");
-  const [serving, setServing] = useState(100);
+  const [unitMode, setUnitMode] = useState<"g" | "other">("g");
+  const [otherUnit, setOtherUnit] = useState<ServingUnit>("piece");
+  const [serving, setServing] = useState(100); // grams when unitMode='g', else count of unit
   const [cal, setCal] = useState(0);
   const [p, setP] = useState(0);
   const [c, setC] = useState(0);
@@ -20,15 +33,27 @@ export const CustomFoodSheet = ({ open, onClose }: Props) => {
 
   if (!open) return null;
 
+  const reset = () => {
+    setName(""); setRegional(""); setUnitMode("g"); setOtherUnit("piece");
+    setServing(100); setCal(0); setP(0); setC(0); setFat(0); setFi(0); setCat("Other");
+  };
+
   const save = () => {
     if (!name.trim() || !serving || !cal) {
       toast.error("Please fill name, serving size, and calories.");
       return;
     }
-    const factor = 100 / serving;
+    // For grams: normalize to per-100g basis (existing behavior).
+    // For non-gram units: store macros as entered for the given count of units; treat 1 portion (= entered count) as 100 "units"
+    // so logging this food gives the entered values for one serving.
+    const factor = unitMode === "g" ? 100 / serving : 1;
+    const displayName = unitMode === "g"
+      ? name.trim()
+      : `${name.trim()} (per ${serving} ${otherUnit}${serving > 1 ? "s" : ""})`;
+
     addCustomFood({
       id: `C-${Date.now()}`, code: `C${Date.now()}`,
-      name: name.trim(), regional: regional.trim() || name.trim(),
+      name: displayName, regional: regional.trim() || name.trim(),
       scientific: "", category: cat,
       moisture: 0, protein: p * factor, fat: fat * factor, fibre: fi * factor,
       carbs: c * factor, energyKj: cal * 4.184 * factor, calories: cal * factor,
@@ -36,7 +61,7 @@ export const CustomFoodSheet = ({ open, onClose }: Props) => {
     });
     toast.success("Custom food saved");
     onClose();
-    setName(""); setRegional(""); setServing(100); setCal(0); setP(0); setC(0); setFat(0); setFi(0);
+    reset();
   };
 
   return (
@@ -52,10 +77,56 @@ export const CustomFoodSheet = ({ open, onClose }: Props) => {
         <div className="flex-1 overflow-y-auto px-4 space-y-3 pb-4">
           <Field label="Food name *"><input value={name} onChange={(e) => setName(e.target.value)} className={input} /></Field>
           <Field label="Regional / local name"><input value={regional} onChange={(e) => setRegional(e.target.value)} className={input} /></Field>
-          <div className="grid grid-cols-2 gap-2">
-            <Field label="Serving (g) *"><input type="number" value={serving} onChange={(e) => setServing(+e.target.value)} className={input} /></Field>
-            <Field label="Calories (kcal) *"><input type="number" value={cal} onChange={(e) => setCal(+e.target.value)} className={input} /></Field>
+
+          {/* Serving unit toggle */}
+          <div>
+            <span className="text-xs font-semibold text-muted-foreground mb-1 block">Serving measured in</span>
+            <div className="grid grid-cols-2 gap-2 p-1 bg-muted rounded-xl">
+              <button
+                type="button"
+                onClick={() => setUnitMode("g")}
+                className={`py-2 rounded-lg text-sm font-semibold transition ${unitMode === "g" ? "bg-card shadow-sm text-foreground" : "text-muted-foreground"}`}
+              >
+                Grams
+              </button>
+              <button
+                type="button"
+                onClick={() => setUnitMode("other")}
+                className={`py-2 rounded-lg text-sm font-semibold transition ${unitMode === "other" ? "bg-card shadow-sm text-foreground" : "text-muted-foreground"}`}
+              >
+                Other unit
+              </button>
+            </div>
           </div>
+
+          {unitMode === "g" ? (
+            <div className="grid grid-cols-2 gap-2">
+              <Field label="Serving (g) *"><input type="number" value={serving} onChange={(e) => setServing(+e.target.value)} className={input} /></Field>
+              <Field label="Calories (kcal) *"><input type="number" value={cal} onChange={(e) => setCal(+e.target.value)} className={input} /></Field>
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-2 gap-2">
+                <Field label="Quantity *">
+                  <input type="number" min={1} value={serving} onChange={(e) => setServing(+e.target.value)} className={input} />
+                </Field>
+                <Field label="Unit *">
+                  <select value={otherUnit} onChange={(e) => setOtherUnit(e.target.value as ServingUnit)} className={input}>
+                    {UNIT_OPTIONS.map((u) => (
+                      <option key={u.value} value={u.value}>{u.label}</option>
+                    ))}
+                  </select>
+                </Field>
+              </div>
+              <Field label="Calories (kcal) *">
+                <input type="number" value={cal} onChange={(e) => setCal(+e.target.value)} className={input} />
+              </Field>
+              <p className="text-[11px] text-muted-foreground -mt-1">
+                Macros below should be the totals for {serving} {otherUnit}{serving > 1 ? "s" : ""}.
+              </p>
+            </>
+          )}
+
           <div className="grid grid-cols-2 gap-2">
             <Field label="Protein (g)"><input type="number" value={p} onChange={(e) => setP(+e.target.value)} className={input} /></Field>
             <Field label="Carbs (g)"><input type="number" value={c} onChange={(e) => setC(+e.target.value)} className={input} /></Field>
