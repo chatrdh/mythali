@@ -183,7 +183,9 @@ export const SearchSheet = ({ open, onClose, defaultMeal, onAddCustom }: Props) 
                   </div>
                   <div className="text-right flex-shrink-0">
                     <div className="font-mono-num text-sm font-semibold">{Math.round(food.calories)}</div>
-                    <div className="text-[10px] text-muted-foreground">kcal/100g</div>
+                    <div className="text-[10px] text-muted-foreground">
+                      kcal/{food.servingUnit && food.servingUnit !== "g" ? `${food.servingSize ?? 1} ${food.servingUnit}` : "100g"}
+                    </div>
                   </div>
                 </button>
               </li>
