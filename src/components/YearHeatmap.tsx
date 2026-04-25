@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { format, parseISO } from "date-fns";
 import { Flame, Calendar, Target, Zap, Share2 } from "lucide-react";
 import { useStore } from "@/store/useStore";
