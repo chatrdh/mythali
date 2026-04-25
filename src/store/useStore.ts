@@ -89,7 +89,24 @@ export const useStore = create<Store>()(
         set((s) => ({ customFoods: s.customFoods.filter((f) => f.id !== id) })),
       updateSettings: (p) => set((s) => ({ settings: { ...s.settings, ...p } })),
     }),
-    { name: "thali-store-v1" }
+    {
+      name: "thali-store-v1",
+      // Migrate old custom foods saved before servingUnit/servingSize fields existed.
+      // Detect "(per N unit)" suffix in the name and backfill the structured fields.
+      onRehydrateStorage: () => (state) => {
+        if (!state) return;
+        const re = /\(per\s+(\d+(?:\.\d+)?)\s+(piece|bowl|cup|serving|slice|tbsp)s?\)/i;
+        let changed = false;
+        const migrated = state.customFoods.map((f) => {
+          if (f.servingUnit && f.servingUnit !== "g") return f;
+          const m = f.name.match(re);
+          if (!m) return f;
+          changed = true;
+          return { ...f, servingUnit: m[2].toLowerCase(), servingSize: Number(m[1]) };
+        });
+        if (changed) state.customFoods = migrated;
+      },
+    }
   )
 );
 
