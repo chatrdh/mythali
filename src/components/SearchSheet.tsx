@@ -261,7 +261,9 @@ const HorizRow = ({ title, items, onPick }: { title: string; items: FoodItem[]; 
         <button key={f.id} onClick={() => onPick(f)}
           className="flex-shrink-0 px-3 py-2 rounded-xl bg-muted hover:bg-muted/70 text-left min-w-[140px]">
           <div className="text-xs font-semibold truncate">{f.name}</div>
-          <div className="text-[10px] text-muted-foreground truncate">{Math.round(f.calories)} kcal/100g</div>
+          <div className="text-[10px] text-muted-foreground truncate">
+            {Math.round(f.calories)} kcal/{f.servingUnit && f.servingUnit !== "g" ? `${f.servingSize ?? 1} ${f.servingUnit}` : "100g"}
+          </div>
         </button>
       ))}
     </div>
