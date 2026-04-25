@@ -21,6 +21,7 @@ export function YearHeatmap() {
   const [year, setYear] = useState(new Date().getFullYear());
   const [hover, setHover] = useState<{ cell: DayCell; x: number; y: number } | null>(null);
   const [shareOpen, setShareOpen] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   const isDark = settings.darkMode;
   const palette = PALETTES[isDark ? "dark" : "light"];
