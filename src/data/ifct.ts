@@ -14,13 +14,17 @@ export interface FoodItem {
   scientific: string;
   category: FoodCategory;
   moisture: number;
-  protein: number;      // g
+  protein: number;      // g (per 100g, or per servingSize units when servingUnit !== 'g')
   fat: number;          // g
   fibre: number;        // g
   carbs: number;        // g
   energyKj: number;
-  calories: number;     // kcal — PRIMARY
+  calories: number;     // kcal — PRIMARY (per 100g, or per servingSize units when servingUnit !== 'g')
   isCustom?: boolean;
+  /** Unit of measurement. Defaults to 'g'. When non-grams, nutrition values are per `servingSize` units. */
+  servingUnit?: string;
+  /** When servingUnit !== 'g', the number of units the stored macros correspond to. */
+  servingSize?: number;
 }
 
 export const CATEGORY_META: Record<FoodCategory, { label: string; emoji: string; color: string }> = {
