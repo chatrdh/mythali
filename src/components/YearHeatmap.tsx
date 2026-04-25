@@ -92,7 +92,7 @@ export function YearHeatmap() {
       </div>
 
       {/* Grid — bigger cells for clarity */}
-      <div className="overflow-x-auto no-scrollbar -mx-2 px-2">
+      <div ref={scrollRef} className="overflow-x-auto no-scrollbar -mx-2 px-2">
         <div className="inline-block min-w-full">
           {/* Month labels — aligned with grid columns (each col = 16 + 3 gap = 19px) */}
           <div className="flex mb-1.5 select-none" style={{ paddingLeft: 30 /* day-label col 26 + gap 4 */ }}>
