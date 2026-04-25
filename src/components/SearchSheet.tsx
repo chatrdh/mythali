@@ -212,7 +212,7 @@ export const SearchSheet = ({ open, onClose, defaultMeal, onAddCustom }: Props) 
               <input type="number" inputMode="decimal" value={qty}
                 onChange={(e) => setQty(Math.max(0, Number(e.target.value) || 0))}
                 className="w-24 px-3 py-2 rounded-xl bg-muted border-0 font-mono-num text-center focus:outline-none focus:ring-2 focus:ring-primary/40" />
-              <span className="text-sm text-muted-foreground">grams</span>
+              <span className="text-sm text-muted-foreground">{unitLabel}</span>
               <div className="ml-auto text-right">
                 <div className="font-mono-num text-lg font-bold text-primary">
                   {Math.round(calcNutrition(selected, qty).calories)}
