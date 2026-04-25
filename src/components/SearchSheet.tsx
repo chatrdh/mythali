@@ -76,6 +76,15 @@ export const SearchSheet = ({ open, onClose, defaultMeal, onAddCustom }: Props) 
       .filter(Boolean) as FoodItem[];
   }, [logs, allFoods]);
 
+  const isUnitFood = !!selected && !!selected.servingUnit && selected.servingUnit !== "g";
+  const unitLabel = isUnitFood ? `${selected!.servingUnit}${qty === 1 ? "" : "s"}` : "grams";
+
+  // Reset qty whenever a new food is picked so unit foods default to 1, gram foods to 100.
+  const pickFood = (f: FoodItem) => {
+    setSelected(f);
+    setQty(f.servingUnit && f.servingUnit !== "g" ? 1 : 100);
+  };
+
   const handleAdd = () => {
     if (!selected) return;
     const n = calcNutrition(selected, qty);
@@ -151,15 +160,15 @@ export const SearchSheet = ({ open, onClose, defaultMeal, onAddCustom }: Props) 
         <div className="flex-1 overflow-y-auto px-2 pb-4">
           {!query && category === "All" && (recent.length > 0 || frequent.length > 0) && (
             <div className="space-y-3 px-2 py-2">
-              {recent.length > 0 && <HorizRow title="🕐 Recently logged" items={recent} onPick={setSelected} />}
-              {frequent.length > 0 && <HorizRow title="⭐ Most frequent" items={frequent} onPick={setSelected} />}
+              {recent.length > 0 && <HorizRow title="🕐 Recently logged" items={recent} onPick={pickFood} />}
+              {frequent.length > 0 && <HorizRow title="⭐ Most frequent" items={frequent} onPick={pickFood} />}
             </div>
           )}
 
           <ul className="mt-1">
             {results.map((food) => (
               <li key={food.id}>
-                <button onClick={() => setSelected(food)}
+                <button onClick={() => pickFood(food)}
                   className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-muted rounded-xl text-left transition">
                   <div className="w-9 h-9 rounded-xl flex items-center justify-center text-lg flex-shrink-0"
                     style={{ background: CATEGORY_META[food.category].color + "22" }}>
@@ -174,7 +183,9 @@ export const SearchSheet = ({ open, onClose, defaultMeal, onAddCustom }: Props) 
                   </div>
                   <div className="text-right flex-shrink-0">
                     <div className="font-mono-num text-sm font-semibold">{Math.round(food.calories)}</div>
-                    <div className="text-[10px] text-muted-foreground">kcal/100g</div>
+                    <div className="text-[10px] text-muted-foreground">
+                      kcal/{food.servingUnit && food.servingUnit !== "g" ? `${food.servingSize ?? 1} ${food.servingUnit}` : "100g"}
+                    </div>
                   </div>
                 </button>
               </li>
@@ -201,7 +212,7 @@ export const SearchSheet = ({ open, onClose, defaultMeal, onAddCustom }: Props) 
               <input type="number" inputMode="decimal" value={qty}
                 onChange={(e) => setQty(Math.max(0, Number(e.target.value) || 0))}
                 className="w-24 px-3 py-2 rounded-xl bg-muted border-0 font-mono-num text-center focus:outline-none focus:ring-2 focus:ring-primary/40" />
-              <span className="text-sm text-muted-foreground">grams</span>
+              <span className="text-sm text-muted-foreground">{unitLabel}</span>
               <div className="ml-auto text-right">
                 <div className="font-mono-num text-lg font-bold text-primary">
                   {Math.round(calcNutrition(selected, qty).calories)}
@@ -250,7 +261,9 @@ const HorizRow = ({ title, items, onPick }: { title: string; items: FoodItem[]; 
         <button key={f.id} onClick={() => onPick(f)}
           className="flex-shrink-0 px-3 py-2 rounded-xl bg-muted hover:bg-muted/70 text-left min-w-[140px]">
           <div className="text-xs font-semibold truncate">{f.name}</div>
-          <div className="text-[10px] text-muted-foreground truncate">{Math.round(f.calories)} kcal/100g</div>
+          <div className="text-[10px] text-muted-foreground truncate">
+            {Math.round(f.calories)} kcal/{f.servingUnit && f.servingUnit !== "g" ? `${f.servingSize ?? 1} ${f.servingUnit}` : "100g"}
+          </div>
         </button>
       ))}
     </div>

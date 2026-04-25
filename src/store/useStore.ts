@@ -105,7 +105,10 @@ export const mealForTime = (d = new Date()): MealType => {
 };
 
 export const calcNutrition = (food: FoodItem, qty: number) => {
-  const k = qty / 100;
+  // For gram-based foods (default), nutrition is per 100g.
+  // For unit-based foods (e.g. piece, bowl), nutrition is per `servingSize` units.
+  const basis = food.servingUnit && food.servingUnit !== "g" ? (food.servingSize || 1) : 100;
+  const k = qty / basis;
   return {
     calories: food.calories * k,
     protein: food.protein * k,
