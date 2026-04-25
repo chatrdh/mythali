@@ -4,7 +4,7 @@
 export type FoodCategory =
   | "Rice" | "Wheat" | "Dal" | "Leafy" | "Vegetable"
   | "Root" | "Condiment" | "Spice" | "Oil" | "NutSeed"
-  | "Dairy" | "Sweet" | "Other";
+  | "Dairy" | "Sweet" | "Homemade" | "Other";
 
 export interface FoodItem {
   id: string;           // use code
