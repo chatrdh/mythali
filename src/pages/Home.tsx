@@ -12,7 +12,7 @@ import { format } from "date-fns";
 const MEALS: MealType[] = ["BREAKFAST", "LUNCH", "DINNER", "SNACKS"];
 
 export default function Home() {
-  const { logs, settings } = useStore();
+  const { logs, settings, updateSettings } = useStore();
   const [sheet, setSheet] = useState<{ open: boolean; meal: MealType }>({ open: false, meal: mealForTime() });
   const [customOpen, setCustomOpen] = useState(false);
 
