@@ -168,7 +168,7 @@ export const SearchSheet = ({ open, onClose, defaultMeal, onAddCustom }: Props) 
           <ul className="mt-1">
             {results.map((food) => (
               <li key={food.id}>
-                <button onClick={() => setSelected(food)}
+                <button onClick={() => pickFood(food)}
                   className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-muted rounded-xl text-left transition">
                   <div className="w-9 h-9 rounded-xl flex items-center justify-center text-lg flex-shrink-0"
                     style={{ background: CATEGORY_META[food.category].color + "22" }}>
