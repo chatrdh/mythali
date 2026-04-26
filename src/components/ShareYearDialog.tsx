@@ -13,33 +13,39 @@ interface Props { open: boolean; onClose: () => void; year: number }
 
 interface ShareTheme {
   bg: string;
+  surface: string;       // inner card surface (parchment)
   text: string;
   textMuted: string;
-  accent: string;
-  accentSoft: string;
-  cardBg: string;
-  cardBorder: string;
+  textSubtle: string;
+  accent: string;        // rose
+  accentSoft: string;    // rose tint
+  border: string;
+  divider: string;
   palette: HeatmapPalette;
 }
 
-const MIDNIGHT: ShareTheme = {
-  bg: "linear-gradient(160deg,#0a0a0f 0%,#16162a 50%,#0d1117 100%)",
-  text: "#ffffff",
-  textMuted: "rgba(255,255,255,0.55)",
-  accent: "#FF6F00",
-  accentSoft: "rgba(255,111,0,0.12)",
-  cardBg: "rgba(255,255,255,0.04)",
-  cardBorder: "rgba(255,255,255,0.08)",
+/* "Rose & Cream" share theme — premium wellness journal feel.
+   Solid colors throughout (html2canvas-safe). */
+const ROSE_CREAM: ShareTheme = {
+  bg: "#FAF7F5",            // warm parchment
+  surface: "#FFFFFF",
+  text: "#2C1F27",          // deep plum-black
+  textMuted: "#8B6B78",     // muted mauve
+  textSubtle: "#C4A8B5",    // placeholder mauve
+  accent: "#A0546A",        // dusty rose
+  accentSoft: "#FAF0F3",    // rose tint
+  border: "rgba(160,84,106,0.14)",
+  divider: "rgba(160,84,106,0.10)",
   palette: {
-    empty: "#161b22",
-    outOfYear: "#0d1117",
-    under:    { 1: "#0d2a3d", 2: "#1a4a6b", 3: "#2196F3" },
-    light:    { 1: "#0d2a3d", 2: "#1a4a6b", 3: "#42a5f5" },
-    on_track: { 1: "#2d6a3f", 2: "#388e3c", 3: "#4CAF50" },
-    over:     { 1: "#cc7a00", 2: "#FF9800", 3: "#ffb74d" },
-    big_over: { 1: "#c62828", 2: "#E53935", 3: "#ef5350" },
-    way_over: { 1: "#8b1a1a", 2: "#b71c1c", 3: "#7f0000" },
-    todayBorder: "rgba(255,255,255,0.7)",
+    empty: "#F1E7EB",
+    outOfYear: "#F8F1F4",
+    under:    { 1: "#5C8A6E", 2: "#5C8A6E", 3: "#5C8A6E" },
+    light:    { 1: "#5C8A6E", 2: "#5C8A6E", 3: "#5C8A6E" },
+    on_track: { 1: "#5C8A6E", 2: "#5C8A6E", 3: "#5C8A6E" },
+    over:     { 1: "#A04455", 2: "#A04455", 3: "#A04455" },
+    big_over: { 1: "#A04455", 2: "#A04455", 3: "#A04455" },
+    way_over: { 1: "#A04455", 2: "#A04455", 3: "#A04455" },
+    todayBorder: "rgba(160,84,106,0.55)",
   },
 };
 
@@ -112,11 +118,19 @@ export function ShareYearDialog({ open, onClose, year }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex flex-col animate-fade-in">
+    <div
+      className="fixed inset-0 z-50 flex flex-col animate-fade-in"
+      style={{ background: "rgba(44,31,39,0.85)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)" }}
+    >
       {/* Header */}
-      <div className="flex items-center justify-between px-4 pt-3 pb-2 text-white safe-top">
-        <div className="text-sm font-semibold">Share your year</div>
-        <button onClick={onClose} className="p-2 -m-2 rounded-full hover:bg-white/10 active:bg-white/20">
+      <div className="flex items-center justify-between px-5 pt-3 pb-2 safe-top" style={{ color: "#F5ECF0" }}>
+        <div className="font-display italic text-[18px]">Share your year</div>
+        <button
+          onClick={onClose}
+          className="p-2 -m-2 rounded-full transition"
+          style={{ color: "#F5ECF0" }}
+          aria-label="Close"
+        >
           <X className="w-5 h-5" />
         </button>
       </div>
@@ -139,14 +153,14 @@ export function ShareYearDialog({ open, onClose, year }: Props) {
               height: CARD_H,
               transform: `scale(${scale})`,
               transformOrigin: "top left",
-              borderRadius: 24 / scale,
+              borderRadius: 28 / scale,
               overflow: "hidden",
-              boxShadow: "0 25px 60px -15px rgba(0,0,0,0.7)",
+              boxShadow: "0 30px 70px -20px rgba(44,31,39,0.55)",
             }}
           >
             <ShareCard
               ref={cardRef}
-              theme={MIDNIGHT}
+              theme={ROSE_CREAM}
               year={year}
               userName={settings.userName}
               goal={settings.calorieGoal}
@@ -159,20 +173,30 @@ export function ShareYearDialog({ open, onClose, year }: Props) {
       </div>
 
       {/* Actions — sticky bottom, thumb-friendly */}
-      <div className="px-4 pt-3 pb-6 bg-gradient-to-t from-black via-black/90 to-transparent safe-bottom">
+      <div
+        className="px-5 pt-3 pb-6 safe-bottom"
+        style={{ background: "linear-gradient(to top, rgba(22,14,18,0.95), rgba(22,14,18,0.6) 60%, transparent)" }}
+      >
         <button
           disabled={busy}
           onClick={download}
-          className="w-full max-w-md mx-auto flex items-center justify-center gap-2 py-4 rounded-2xl bg-gradient-to-r from-primary to-primary-glow text-primary-foreground font-semibold active:scale-[0.98] transition disabled:opacity-50 shadow-lg"
+          className="w-full max-w-md mx-auto flex items-center justify-center gap-2 py-4 rounded-full font-medium tracking-wide active:scale-[0.98] transition disabled:opacity-50"
+          style={{
+            background: "#A0546A",
+            color: "#FFFFFF",
+            boxShadow: "0 8px 24px rgba(160,84,106,0.35), 0 0 20px rgba(196,114,138,0.2)",
+            fontFamily: "'DM Sans', system-ui, sans-serif",
+            letterSpacing: "0.03em",
+          }}
         >
-          <Download className="w-5 h-5" /> {busy ? "Generating…" : "Save image"}
+          <Download className="w-[18px] h-[18px]" /> {busy ? "Generating…" : "Save image"}
         </button>
       </div>
     </div>
   );
 }
 
-/* ---------------- Share Card (1080×1350 portrait) ---------------- */
+/* ---------------- Share Card (1080×1350 portrait, Rose & Cream) ---------------- */
 
 interface ShareCardProps {
   theme: ShareTheme;
@@ -186,11 +210,15 @@ interface ShareCardProps {
 
 const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
   ({ theme: t, year, userName, goal, stats, grid, months }, ref) => {
-    const SQ = 15;
-    const GAP = 2;
+    const SQ = 14;
+    const GAP = 3;
     const colW = SQ + GAP;
     const gridW = 53 * colW - GAP;
     const displayName = (userName || "").trim() || "Foodie";
+
+    const sansStack = "'DM Sans', system-ui, -apple-system, sans-serif";
+    const displayStack = "'Cormorant Garamond', Georgia, serif";
+    const monoStack = "'DM Mono', ui-monospace, monospace";
 
     return (
       <div
@@ -200,70 +228,128 @@ const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
           height: CARD_H,
           background: t.bg,
           color: t.text,
-          fontFamily: "Inter, system-ui, -apple-system, sans-serif",
+          fontFamily: sansStack,
           position: "relative",
           boxSizing: "border-box",
           overflow: "hidden",
           display: "flex",
           flexDirection: "column",
-          padding: "72px 64px 56px",
+          padding: "80px 72px 64px",
         }}
       >
+        {/* Decorative soft rose orb (top-right) */}
+        <div
+          style={{
+            position: "absolute",
+            top: -180, right: -160,
+            width: 520, height: 520,
+            borderRadius: "50%",
+            background: "#FAF0F3",
+            opacity: 0.85,
+            zIndex: 1,
+          }}
+        />
+        {/* Decorative blush orb (bottom-left) */}
+        <div
+          style={{
+            position: "absolute",
+            bottom: -200, left: -180,
+            width: 460, height: 460,
+            borderRadius: "50%",
+            background: "#FDF5F7",
+            opacity: 0.7,
+            zIndex: 1,
+          }}
+        />
+
         {/* ---------- Top: Brand chip ---------- */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", zIndex: 2 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
             <div style={{
-              width: 52, height: 52, borderRadius: 14,
-              background: `linear-gradient(135deg, ${t.accent}, #E65100)`,
+              width: 56, height: 56, borderRadius: 16,
+              background: "#A0546A",
               display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: 28,
+              fontSize: 30,
+              boxShadow: "0 6px 16px rgba(160,84,106,0.25)",
             }}>🍛</div>
             <div>
-              <div style={{ fontSize: 24, fontWeight: 800, letterSpacing: -0.4, lineHeight: 1 }}>Thali</div>
-              <div style={{ fontSize: 13, color: t.textMuted, marginTop: 4, fontWeight: 500 }}>Indian calorie tracker</div>
+              <div style={{
+                fontFamily: displayStack,
+                fontSize: 30, fontWeight: 600, letterSpacing: -0.4, lineHeight: 1,
+                fontStyle: "italic",
+              }}>
+                Thali
+              </div>
+              <div style={{
+                fontFamily: monoStack,
+                fontSize: 11, color: t.textMuted, marginTop: 6,
+                letterSpacing: 2, textTransform: "uppercase",
+              }}>
+                Indian calorie tracker
+              </div>
             </div>
           </div>
           <div style={{
-            fontSize: 14, fontWeight: 800, letterSpacing: 2,
-            color: t.accent, padding: "8px 16px", borderRadius: 999,
+            fontFamily: monoStack,
+            fontSize: 14, fontWeight: 500, letterSpacing: 3,
+            color: t.accent, padding: "10px 20px", borderRadius: 999,
             background: t.accentSoft,
-            border: `1px solid ${t.cardBorder}`,
+            border: `1px solid ${t.border}`,
           }}>
             {year}
           </div>
         </div>
 
         {/* ---------- Title block ---------- */}
-        <div style={{ marginTop: 64, zIndex: 2 }}>
-          <div style={{ fontSize: 16, color: t.textMuted, letterSpacing: 6, fontWeight: 700, textTransform: "uppercase" }}>
+        <div style={{ marginTop: 72, zIndex: 2 }}>
+          <div style={{
+            fontFamily: monoStack,
+            fontSize: 13, color: t.textMuted, letterSpacing: 6,
+            fontWeight: 500, textTransform: "uppercase",
+          }}>
             My Year in Calories
           </div>
           <div style={{
-            fontSize: 88, fontWeight: 900, marginTop: 14, letterSpacing: -3, lineHeight: 0.95,
+            fontFamily: displayStack,
+            fontSize: 132, fontWeight: 600, marginTop: 18,
+            letterSpacing: -2, lineHeight: 0.95,
+            fontStyle: "italic",
+            color: t.text,
           }}>
             {displayName}
           </div>
-          <div style={{ fontSize: 18, color: t.textMuted, marginTop: 14, fontWeight: 500 }}>
-            {goal.toLocaleString()} kcal/day goal
+          <div style={{
+            fontFamily: monoStack,
+            fontSize: 14, color: t.textMuted, marginTop: 18,
+            letterSpacing: 1.5,
+          }}>
+            {goal.toLocaleString()} kcal · daily goal
           </div>
         </div>
 
         {/* ---------- Heatmap card ---------- */}
         <div style={{
-          marginTop: 44,
-          padding: "32px 28px",
-          background: t.cardBg,
-          border: `1px solid ${t.cardBorder}`,
+          marginTop: 48,
+          padding: "36px 32px 30px",
+          background: t.surface,
+          border: `1px solid ${t.border}`,
           borderRadius: 24,
           display: "flex", flexDirection: "column", alignItems: "center",
+          boxShadow: "0 4px 30px rgba(160,84,106,0.06)",
           zIndex: 2,
         }}>
           {/* month labels */}
-          <div style={{ display: "flex", width: gridW, marginBottom: 8 }}>
+          <div style={{ display: "flex", width: gridW, marginBottom: 10 }}>
             {grid.map((_, i) => {
               const m = months.find((mm) => mm.col === i);
               return (
-                <div key={i} style={{ width: colW, fontSize: 11, color: t.textMuted, fontWeight: 600 }}>
+                <div key={i} style={{
+                  width: colW,
+                  fontFamily: monoStack,
+                  fontSize: 10,
+                  color: t.textMuted,
+                  letterSpacing: 0.5,
+                }}>
                   {m?.label ?? ""}
                 </div>
               );
@@ -280,7 +366,7 @@ const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
                       style={{
                         width: SQ, height: SQ, borderRadius: 3,
                         background: colorFor(cell, t.palette),
-                        opacity: cell.inYear ? 1 : 0.35,
+                        opacity: cell.inYear ? 1 : 0.45,
                         boxShadow: today ? `inset 0 0 0 1.5px ${t.palette.todayBorder}` : undefined,
                       }}
                     />
@@ -292,17 +378,20 @@ const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
 
           {/* Legend inline below grid — two states */}
           <div style={{
-            display: "flex", alignItems: "center", justifyContent: "center", gap: 24,
-            marginTop: 22, fontSize: 13, color: t.textMuted, fontWeight: 600,
+            display: "flex", alignItems: "center", justifyContent: "center", gap: 28,
+            marginTop: 24,
+            fontFamily: monoStack,
+            fontSize: 11, color: t.textMuted, letterSpacing: 1.2,
+            textTransform: "uppercase",
           }}>
             <LegendChip c={t.palette.on_track[2]} label="On goal" t={t} />
             <LegendChip c={t.palette.over[2]} label="Over goal" t={t} />
           </div>
         </div>
 
-        {/* ---------- Stats grid (2×2, big numbers) ---------- */}
+        {/* ---------- Stats grid (2×2, editorial display numbers) ---------- */}
         <div style={{
-          display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginTop: 28, zIndex: 2,
+          display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18, marginTop: 30, zIndex: 2,
         }}>
           <ShareStat t={t} label="Current streak" value={`${stats.streak}`} unit="days" />
           <ShareStat t={t} label="Days logged" value={`${stats.loggedDays}`} unit={`/ ${stats.totalDays}`} />
@@ -317,18 +406,38 @@ const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
 
         {/* ---------- Footer ---------- */}
         <div style={{
-          marginTop: "auto", paddingTop: 28,
+          marginTop: "auto", paddingTop: 32,
           display: "flex", alignItems: "center", justifyContent: "space-between",
-          borderTop: `1px solid ${t.cardBorder}`,
+          borderTop: `1px solid ${t.divider}`,
           zIndex: 2,
         }}>
-          <div style={{ fontSize: 13, color: t.textMuted, fontWeight: 600, lineHeight: 1.4 }}>
-            Tracked with <span style={{ color: t.text, fontWeight: 800 }}>Thali</span> 🍛<br/>
-            <span style={{ fontSize: 11, opacity: 0.75 }}>Powered by IFCT 2017 · NIN, Hyderabad 🇮🇳</span>
+          <div style={{ lineHeight: 1.6 }}>
+            <div style={{
+              fontFamily: sansStack,
+              fontSize: 13, color: t.textMuted, fontWeight: 400,
+            }}>
+              Tracked with{" "}
+              <span style={{
+                fontFamily: displayStack,
+                color: t.accent, fontWeight: 600, fontStyle: "italic", fontSize: 16,
+              }}>
+                Thali
+              </span>{" "}
+              🍛
+            </div>
+            <div style={{
+              fontFamily: monoStack,
+              fontSize: 10, color: t.textSubtle, letterSpacing: 1, marginTop: 4,
+            }}>
+              Powered by IFCT 2017 · NIN, Hyderabad 🇮🇳
+            </div>
           </div>
           <div style={{
-            fontSize: 11, color: t.textMuted, fontWeight: 700, letterSpacing: 1.5,
-            padding: "6px 12px", borderRadius: 8, border: `1px solid ${t.cardBorder}`,
+            fontFamily: monoStack,
+            fontSize: 11, color: t.accent, fontWeight: 500, letterSpacing: 2,
+            padding: "8px 16px", borderRadius: 999,
+            border: `1px solid ${t.border}`,
+            background: t.accentSoft,
           }}>
             mythali.app
           </div>
@@ -340,24 +449,35 @@ const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
 ShareCard.displayName = "ShareCard";
 
 function ShareStat({ t, label, value, unit }: { t: ShareTheme; label: string; value: string; unit: string }) {
+  const sansStack = "'DM Sans', system-ui, -apple-system, sans-serif";
+  const displayStack = "'Cormorant Garamond', Georgia, serif";
+  const monoStack = "'DM Mono', ui-monospace, monospace";
   return (
     <div style={{
-      background: t.cardBg, border: `1px solid ${t.cardBorder}`,
-      borderRadius: 18, padding: "20px 22px",
+      background: t.surface,
+      border: `1px solid ${t.border}`,
+      borderRadius: 20,
+      padding: "24px 26px",
+      boxShadow: "0 2px 16px rgba(160,84,106,0.05)",
     }}>
       <div style={{
-        fontSize: 11, color: t.textMuted, fontWeight: 700,
-        letterSpacing: 1.2, textTransform: "uppercase",
+        fontFamily: monoStack,
+        fontSize: 10, color: t.textMuted, fontWeight: 500,
+        letterSpacing: 2, textTransform: "uppercase",
       }}>
         {label}
       </div>
       <div style={{
-        fontSize: 44, fontWeight: 900, color: t.accent,
-        lineHeight: 1.05, marginTop: 8, letterSpacing: -1.5,
+        fontFamily: displayStack,
+        fontSize: 64, fontWeight: 600, color: t.accent,
+        lineHeight: 1.05, marginTop: 10, letterSpacing: -1.5,
       }}>
         {value}
       </div>
-      <div style={{ fontSize: 12, color: t.textMuted, marginTop: 4, fontWeight: 600 }}>
+      <div style={{
+        fontFamily: sansStack,
+        fontSize: 13, color: t.textMuted, marginTop: 4, fontWeight: 400,
+      }}>
         {unit}
       </div>
     </div>
@@ -366,7 +486,7 @@ function ShareStat({ t, label, value, unit }: { t: ShareTheme; label: string; va
 
 function LegendChip({ c, label, t }: { c: string; label: string; t: ShareTheme }) {
   return (
-    <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+    <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
       <span style={{ width: 11, height: 11, borderRadius: 3, background: c, display: "inline-block" }} />
       <span style={{ color: t.textMuted }}>{label}</span>
     </span>
