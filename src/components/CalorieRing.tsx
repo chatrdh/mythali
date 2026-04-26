@@ -26,19 +26,14 @@ export const CalorieRing = ({ consumed, goal, size = 280, className }: Props) =>
     return () => cancelAnimationFrame(raf);
   }, [pct]);
 
-  const stroke = 18;
+  const stroke = 14;
   const radius = (size - stroke) / 2;
   const C = 2 * Math.PI * radius;
   const offset = C * (1 - Math.min(animated, 1));
 
-  const ringColor =
-    pct >= 1 ? "hsl(var(--destructive))"
-    : pct >= 0.9 ? "hsl(var(--warning))"
-    : pct >= 0.7 ? "hsl(var(--primary))"
-    : "hsl(var(--success))";
-
+  const over = consumed > goal;
+  const ringColor = over ? "hsl(var(--destructive))" : "hsl(var(--primary-glow))";
   const remaining = goal - consumed;
-  const over = remaining < 0;
 
   return (
     <div className={cn("relative flex items-center justify-center", className)} style={{ width: size, height: size }}>
@@ -46,13 +41,13 @@ export const CalorieRing = ({ consumed, goal, size = 280, className }: Props) =>
         <defs>
           <linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1">
             <stop offset="0%" stopColor="hsl(var(--primary))" />
-            <stop offset="100%" stopColor="hsl(var(--primary-glow))" />
+            <stop offset="100%" stopColor="hsl(var(--accent))" />
           </linearGradient>
         </defs>
-        <circle cx={size/2} cy={size/2} r={radius} stroke="hsl(var(--muted))" strokeWidth={stroke} fill="none" />
+        <circle cx={size/2} cy={size/2} r={radius} stroke="hsl(var(--cream-200))" strokeWidth={stroke} fill="none" />
         <circle
           cx={size/2} cy={size/2} r={radius}
-          stroke={pct >= 0.9 ? ringColor : "url(#ringGrad)"}
+          stroke={over ? ringColor : "url(#ringGrad)"}
           strokeWidth={stroke}
           strokeLinecap="round"
           fill="none"
@@ -62,18 +57,20 @@ export const CalorieRing = ({ consumed, goal, size = 280, className }: Props) =>
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <div className="text-xs uppercase tracking-widest text-muted-foreground mb-1">Today</div>
-        <div className="font-mono-num text-4xl font-bold text-foreground">
+        <div className="font-mono-num text-[10px] uppercase tracking-[0.2em] text-muted-foreground mb-1">Today</div>
+        <div className="font-display text-[44px] font-semibold leading-none text-foreground tabular-nums">
           {Math.round(consumed).toLocaleString()}
         </div>
-        <div className="font-mono-num text-sm text-muted-foreground mt-0.5">
+        <div className="font-mono-num text-[11px] text-muted-foreground mt-2 tracking-wider">
           / {goal.toLocaleString()} kcal
         </div>
         <div className={cn(
-          "mt-2 text-xs font-medium px-3 py-1 rounded-full",
-          over ? "bg-destructive/10 text-destructive" : "bg-success/10 text-success"
+          "mt-3 font-mono-num text-[11px] tracking-[0.04em] px-3.5 py-1 rounded-full border",
+          over
+            ? "bg-destructive/10 text-destructive border-destructive/30"
+            : "bg-success/10 text-success border-success/30"
         )}>
-          {over ? `${Math.round(-remaining)} kcal over` : `${Math.round(remaining)} kcal left`}
+          {over ? `${Math.round(-remaining)} over` : `${Math.round(remaining)} left`}
         </div>
       </div>
     </div>
