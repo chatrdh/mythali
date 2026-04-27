@@ -40,7 +40,7 @@ export const CATEGORY_META: Record<FoodCategory, { label: string; emoji: string;
   NutSeed:    { label: "Nuts",       emoji: "🥜", color: "hsl(28 55% 45%)" },
   Dairy:      { label: "Dairy",      emoji: "🥛", color: "hsl(210 30% 70%)" },
   Sweet:      { label: "Sweet",      emoji: "🍯", color: "hsl(42 95% 55%)" },
-  Homemade:   { label: "Homemade",   emoji: "🍛", color: "hsl(20 75% 50%)" },
+  Homemade:   { label: "Custom",     emoji: "⭐", color: "hsl(20 75% 50%)" },
   Other:      { label: "Other",      emoji: "🍋", color: "hsl(200 40% 55%)" },
 };
 

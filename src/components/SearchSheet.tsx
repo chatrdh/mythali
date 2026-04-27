@@ -149,7 +149,9 @@ export const SearchSheet = ({ open, onClose, defaultMeal, onAddCustom, date }: P
 
           <div className="px-4 pb-2 flex gap-1.5 overflow-x-auto no-scrollbar">
             <Chip active={category === "All"} onClick={() => setCategory("All")} label="All" />
-            {(Object.keys(CATEGORY_META) as FoodCategory[]).map((c) => (
+            <Chip active={category === "Homemade"} onClick={() => setCategory("Homemade")}
+              label={`${CATEGORY_META.Homemade.emoji} ${CATEGORY_META.Homemade.label}`} />
+            {(Object.keys(CATEGORY_META) as FoodCategory[]).filter((c) => c !== "Homemade").map((c) => (
               <Chip key={c} active={category === c} onClick={() => setCategory(c)}
                 label={`${CATEGORY_META[c].emoji} ${CATEGORY_META[c].label}`} />
             ))}
