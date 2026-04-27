@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { Search, X, Plus, Sparkles } from "lucide-react";
+import { Search, X, Plus, Sparkles, ChefHat } from "lucide-react";
 import { IFCT_FOODS, CATEGORY_META, FoodCategory, FoodItem } from "@/data/ifct";
 import { calcNutrition, MealType, todayStr, useStore } from "@/store/useStore";
 import { cn } from "@/lib/utils";
@@ -11,6 +11,7 @@ interface Props {
   onClose: () => void;
   defaultMeal: MealType;
   onAddCustom: () => void;
+  onAddRecipe: () => void;
   /** When set, logs are saved to this date instead of today. Format: YYYY-MM-DD */
   date?: string;
 }
@@ -20,7 +21,7 @@ const MEAL_LABELS: Record<MealType, string> = {
 };
 const MEALS: MealType[] = ["BREAKFAST", "LUNCH", "DINNER", "SNACKS"];
 
-export const SearchSheet = ({ open, onClose, defaultMeal, onAddCustom, date }: Props) => {
+export const SearchSheet = ({ open, onClose, defaultMeal, onAddCustom, onAddRecipe, date }: Props) => {
   const { customFoods, logs, addLog } = useStore();
   const [meal, setMeal] = useState<MealType>(defaultMeal);
   const [query, setQuery] = useState("");
@@ -196,6 +197,10 @@ export const SearchSheet = ({ open, onClose, defaultMeal, onAddCustom, date }: P
           <button onClick={onAddCustom}
             className="w-full mt-3 py-3 text-sm font-semibold text-primary flex items-center justify-center gap-1.5 hover:bg-primary/5 rounded-xl">
             <Sparkles className="w-4 h-4" /> Can't find it? Add custom food
+          </button>
+          <button onClick={onAddRecipe}
+            className="w-full py-3 text-sm font-semibold text-primary flex items-center justify-center gap-1.5 hover:bg-primary/5 rounded-xl">
+            <ChefHat className="w-4 h-4" /> Create recipe from foods
           </button>
         </div>
       </div>

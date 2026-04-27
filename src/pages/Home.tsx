@@ -6,6 +6,7 @@ import { MacroPillRow } from "@/components/MacroPillRow";
 import { MealSectionCard } from "@/components/MealSectionCard";
 import { SearchSheet } from "@/components/SearchSheet";
 import { CustomFoodSheet } from "@/components/CustomFoodSheet";
+import { RecipeBuilderSheet } from "@/components/RecipeBuilderSheet";
 import { MealType, mealForTime, todayStr, useStore } from "@/store/useStore";
 import { format } from "date-fns";
 
@@ -15,6 +16,7 @@ export default function Home() {
   const { logs, settings, updateSettings } = useStore();
   const [sheet, setSheet] = useState<{ open: boolean; meal: MealType }>({ open: false, meal: mealForTime() });
   const [customOpen, setCustomOpen] = useState(false);
+  const [recipeOpen, setRecipeOpen] = useState(false);
 
   const today = todayStr();
   const todayLogs = useMemo(() => logs.filter((l) => l.date === today), [logs, today]);
@@ -86,8 +88,10 @@ export default function Home() {
 
       <SearchSheet open={sheet.open} defaultMeal={sheet.meal}
         onClose={() => setSheet((s) => ({ ...s, open: false }))}
-        onAddCustom={() => { setSheet((s) => ({ ...s, open: false })); setCustomOpen(true); }} />
+        onAddCustom={() => { setSheet((s) => ({ ...s, open: false })); setCustomOpen(true); }}
+        onAddRecipe={() => { setSheet((s) => ({ ...s, open: false })); setRecipeOpen(true); }} />
       <CustomFoodSheet open={customOpen} onClose={() => setCustomOpen(false)} />
+      <RecipeBuilderSheet open={recipeOpen} onClose={() => setRecipeOpen(false)} />
     </div>
   );
 }

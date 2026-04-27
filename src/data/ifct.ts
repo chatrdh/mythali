@@ -25,6 +25,8 @@ export interface FoodItem {
   servingUnit?: string;
   /** When servingUnit !== 'g', the number of units the stored macros correspond to. */
   servingSize?: number;
+  /** For recipes: the list of constituent ingredients and their quantities. */
+  ingredients?: { foodId: string; foodName: string; qty: number }[];
 }
 
 export const CATEGORY_META: Record<FoodCategory, { label: string; emoji: string; color: string }> = {

@@ -4,6 +4,7 @@ import { MealType, useStore } from "@/store/useStore";
 import { MealSectionCard } from "@/components/MealSectionCard";
 import { SearchSheet } from "@/components/SearchSheet";
 import { CustomFoodSheet } from "@/components/CustomFoodSheet";
+import { RecipeBuilderSheet } from "@/components/RecipeBuilderSheet";
 import { cn } from "@/lib/utils";
 
 const MEALS: MealType[] = ["BREAKFAST", "LUNCH", "DINNER", "SNACKS"];
@@ -18,6 +19,7 @@ export default function History() {
   const [selected, setSelected] = useState(() => format(new Date(), "yyyy-MM-dd"));
   const [sheet, setSheet] = useState<{ open: boolean; meal: MealType }>({ open: false, meal: "BREAKFAST" });
   const [customOpen, setCustomOpen] = useState(false);
+  const [recipeOpen, setRecipeOpen] = useState(false);
 
   const dayLogs = logs.filter((l) => l.date === selected);
   const dayTotal = dayLogs.reduce((a, l) => a + l.calories, 0);
@@ -67,8 +69,10 @@ export default function History() {
         date={selected}
         onClose={() => setSheet((s) => ({ ...s, open: false }))}
         onAddCustom={() => { setSheet((s) => ({ ...s, open: false })); setCustomOpen(true); }}
+        onAddRecipe={() => { setSheet((s) => ({ ...s, open: false })); setRecipeOpen(true); }}
       />
       <CustomFoodSheet open={customOpen} onClose={() => setCustomOpen(false)} />
+      <RecipeBuilderSheet open={recipeOpen} onClose={() => setRecipeOpen(false)} />
     </div>
   );
 }
