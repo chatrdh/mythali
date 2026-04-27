@@ -10,6 +10,8 @@ interface Props {
   onClose: () => void;
   defaultMeal: MealType;
   onAddCustom: () => void;
+  /** When set, logs are saved to this date instead of today. Format: YYYY-MM-DD */
+  date?: string;
 }
 
 const MEAL_LABELS: Record<MealType, string> = {
@@ -17,7 +19,7 @@ const MEAL_LABELS: Record<MealType, string> = {
 };
 const MEALS: MealType[] = ["BREAKFAST", "LUNCH", "DINNER", "SNACKS"];
 
-export const SearchSheet = ({ open, onClose, defaultMeal, onAddCustom }: Props) => {
+export const SearchSheet = ({ open, onClose, defaultMeal, onAddCustom, date }: Props) => {
   const { customFoods, logs, addLog } = useStore();
   const [meal, setMeal] = useState<MealType>(defaultMeal);
   const [query, setQuery] = useState("");
@@ -92,7 +94,7 @@ export const SearchSheet = ({ open, onClose, defaultMeal, onAddCustom }: Props) 
       regionalName: selected.regional,
       category: selected.category,
       mealType: meal,
-      date: todayStr(),
+      date: date ?? todayStr(),
       quantityGrams: qty,
       ...n,
     });
@@ -108,7 +110,7 @@ export const SearchSheet = ({ open, onClose, defaultMeal, onAddCustom }: Props) 
       <div className="absolute inset-0 bg-foreground/60 backdrop-blur-md" />
       <div
         className="relative bg-card rounded-t-[28px] flex flex-col animate-slide-up shadow-elevated"
-        style={{ height: "88dvh", maxHeight: "88dvh" }}
+        style={{ height: "calc(100% - 16px)", maxHeight: "calc(100% - 16px)" }}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex-shrink-0 pt-2">
@@ -197,13 +199,13 @@ export const SearchSheet = ({ open, onClose, defaultMeal, onAddCustom }: Props) 
       {/* Selected food action panel — rendered as its own overlay so it's always reachable */}
       {selected && (
         <div
-          className="fixed inset-0 z-[80] flex items-end sm:items-center justify-center animate-fade-in"
+          className="fixed inset-0 z-[80] flex items-center justify-center animate-fade-in"
           onClick={() => setSelected(null)}
         >
           <div className="absolute inset-0 bg-foreground/70 backdrop-blur-md" />
           <div
-            className="relative w-[calc(100%-16px)] sm:max-w-sm bg-card rounded-[24px] shadow-elevated animate-slide-up flex flex-col mb-[88px] sm:mb-0"
-            style={{ maxHeight: "calc(90dvh - 88px)" }}
+            className="relative w-[calc(100%-32px)] max-w-sm bg-card rounded-[24px] shadow-elevated animate-scale-in flex flex-col"
+            style={{ maxHeight: "80dvh" }}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="overflow-y-auto px-4 pt-4 pb-2 flex-1 min-h-0">

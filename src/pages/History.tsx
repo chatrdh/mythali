@@ -64,6 +64,7 @@ export default function History() {
       <SearchSheet
         open={sheet.open}
         defaultMeal={sheet.meal}
+        date={selected}
         onClose={() => setSheet((s) => ({ ...s, open: false }))}
         onAddCustom={() => { setSheet((s) => ({ ...s, open: false })); setCustomOpen(true); }}
       />

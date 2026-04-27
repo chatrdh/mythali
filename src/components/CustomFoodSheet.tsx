@@ -29,13 +29,13 @@ export const CustomFoodSheet = ({ open, onClose }: Props) => {
   const [c, setC] = useState(0);
   const [fat, setFat] = useState(0);
   const [fi, setFi] = useState(0);
-  const [cat, setCat] = useState<FoodCategory>("Other");
+  const [cat, setCat] = useState<FoodCategory>("Homemade");
 
   if (!open) return null;
 
   const reset = () => {
     setName(""); setRegional(""); setUnitMode("g"); setOtherUnit("piece");
-    setServing(100); setCal(0); setP(0); setC(0); setFat(0); setFi(0); setCat("Other");
+    setServing(100); setCal(0); setP(0); setC(0); setFat(0); setFi(0); setCat("Homemade");
   };
 
   const save = () => {
@@ -69,7 +69,7 @@ export const CustomFoodSheet = ({ open, onClose }: Props) => {
   return (
     <div className="fixed inset-0 z-[60] flex flex-col justify-end animate-fade-in" onClick={onClose}>
       <div className="absolute inset-0 bg-foreground/40 backdrop-blur-sm" />
-      <div className="relative bg-card rounded-t-[28px] h-[90vh] flex flex-col animate-slide-up" onClick={(e) => e.stopPropagation()}>
+      <div className="relative bg-card rounded-t-[28px] flex flex-col animate-slide-up shadow-elevated" style={{ height: "calc(100% - 16px)", maxHeight: "calc(100% - 16px)" }} onClick={(e) => e.stopPropagation()}>
         <div className="w-10 h-1 bg-muted rounded-full mx-auto mt-2 mb-3" />
         <div className="flex items-center justify-between px-4 pb-2">
           <h2 className="text-lg font-bold">Add custom food</h2>
@@ -146,8 +146,8 @@ export const CustomFoodSheet = ({ open, onClose }: Props) => {
           </Field>
         </div>
 
-        <div className="flex-shrink-0 p-4 border-t border-border safe-bottom">
-          <button onClick={save} className="w-full py-3 rounded-xl bg-gradient-primary text-primary-foreground font-semibold shadow-elevated active:scale-[0.98]">
+        <div className="flex-shrink-0 px-4 pt-4 pb-24 border-t border-border">
+          <button onClick={save} className="w-full py-3.5 rounded-xl bg-gradient-primary text-primary-foreground font-semibold shadow-elevated active:scale-[0.98] transition">
             Save food
           </button>
         </div>

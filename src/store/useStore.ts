@@ -49,7 +49,7 @@ const DEFAULT_SETTINGS: Settings = {
   proteinGoal: 150,
   carbsGoal: 250,
   fatGoal: 65,
-  darkMode: false,
+  darkMode: true,
   onboardingDone: false,
 };
 

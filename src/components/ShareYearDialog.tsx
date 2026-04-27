@@ -13,45 +13,43 @@ interface Props { open: boolean; onClose: () => void; year: number }
 
 interface ShareTheme {
   bg: string;
-  surface: string;       // inner card surface (parchment)
+  surface: string;
   text: string;
   textMuted: string;
   textSubtle: string;
-  accent: string;        // rose
-  accentSoft: string;    // rose tint
+  accent: string;
+  accentGlow: string;
   border: string;
   divider: string;
   palette: HeatmapPalette;
 }
 
-/* "Rose & Cream" share theme — premium wellness journal feel.
-   Solid colors throughout (html2canvas-safe). */
-const ROSE_CREAM: ShareTheme = {
-  bg: "#FAF7F5",            // warm parchment
-  surface: "#FFFFFF",
-  text: "#2C1F27",          // deep plum-black
-  textMuted: "#8B6B78",     // muted mauve
-  textSubtle: "#C4A8B5",    // placeholder mauve
-  accent: "#A0546A",        // dusty rose
-  accentSoft: "#FAF0F3",    // rose tint
-  border: "rgba(160,84,106,0.14)",
-  divider: "rgba(160,84,106,0.10)",
+/* Dark premium theme — deep plum with rose accents */
+const DARK_ROSE: ShareTheme = {
+  bg: "#120C10",
+  surface: "#1C1318",
+  text: "#F5ECF0",
+  textMuted: "#9E7A8A",
+  textSubtle: "#5A3E4C",
+  accent: "#E8A0B4",
+  accentGlow: "#D4849C",
+  border: "rgba(232,160,180,0.12)",
+  divider: "rgba(232,160,180,0.08)",
   palette: {
-    empty: "#F1E7EB",
-    outOfYear: "#F8F1F4",
-    under:    { 1: "#5C8A6E", 2: "#5C8A6E", 3: "#5C8A6E" },
-    light:    { 1: "#5C8A6E", 2: "#5C8A6E", 3: "#5C8A6E" },
-    on_track: { 1: "#5C8A6E", 2: "#5C8A6E", 3: "#5C8A6E" },
+    empty: "#1E151A",
+    outOfYear: "#160E12",
+    under:    { 1: "#7AAE94", 2: "#7AAE94", 3: "#7AAE94" },
+    light:    { 1: "#7AAE94", 2: "#7AAE94", 3: "#7AAE94" },
+    on_track: { 1: "#7AAE94", 2: "#7AAE94", 3: "#7AAE94" },
     over:     { 1: "#A04455", 2: "#A04455", 3: "#A04455" },
     big_over: { 1: "#A04455", 2: "#A04455", 3: "#A04455" },
     way_over: { 1: "#A04455", 2: "#A04455", 3: "#A04455" },
-    todayBorder: "rgba(160,84,106,0.55)",
+    todayBorder: "rgba(232,160,180,0.65)",
   },
 };
 
-// Card dims — portrait, story-friendly, also fits IG feed (4:5)
 const CARD_W = 1080;
-const CARD_H = 1350;
+const CARD_H = 1920; // Full 9:16 portrait for stories
 
 export function ShareYearDialog({ open, onClose, year }: Props) {
   const { logs, settings } = useStore();
@@ -71,7 +69,6 @@ export function ShareYearDialog({ open, onClose, year }: Props) {
     return () => { document.body.style.overflow = prev; };
   }, [open]);
 
-  // Measure available preview width and scale the 1080×1350 card to fit
   useLayoutEffect(() => {
     if (!open) return;
     const compute = () => {
@@ -120,7 +117,7 @@ export function ShareYearDialog({ open, onClose, year }: Props) {
   return (
     <div
       className="fixed inset-0 z-50 flex flex-col animate-fade-in"
-      style={{ background: "rgba(44,31,39,0.85)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)" }}
+      style={{ background: "#0A0709", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)" }}
     >
       {/* Header */}
       <div className="flex items-center justify-between px-5 pt-3 pb-2 safe-top" style={{ color: "#F5ECF0" }}>
@@ -135,7 +132,7 @@ export function ShareYearDialog({ open, onClose, year }: Props) {
         </button>
       </div>
 
-      {/* Preview — fills available space, card is scaled to fit */}
+      {/* Preview */}
       <div
         ref={previewWrapRef}
         className="flex-1 min-h-0 px-4 py-3 flex items-center justify-center overflow-hidden"
@@ -153,14 +150,14 @@ export function ShareYearDialog({ open, onClose, year }: Props) {
               height: CARD_H,
               transform: `scale(${scale})`,
               transformOrigin: "top left",
-              borderRadius: 28 / scale,
+              borderRadius: 32 / scale,
               overflow: "hidden",
-              boxShadow: "0 30px 70px -20px rgba(44,31,39,0.55)",
+              boxShadow: "0 40px 100px -30px rgba(232,160,180,0.15)",
             }}
           >
             <ShareCard
               ref={cardRef}
-              theme={ROSE_CREAM}
+              theme={DARK_ROSE}
               year={year}
               userName={settings.userName}
               goal={settings.calorieGoal}
@@ -172,20 +169,21 @@ export function ShareYearDialog({ open, onClose, year }: Props) {
         </div>
       </div>
 
-      {/* Actions — sticky bottom, thumb-friendly */}
+      {/* Actions */}
       <div
         className="px-5 pt-3 pb-6 safe-bottom"
-        style={{ background: "linear-gradient(to top, rgba(22,14,18,0.95), rgba(22,14,18,0.6) 60%, transparent)" }}
+        style={{ background: "linear-gradient(to top, rgba(10,7,9,0.98), rgba(10,7,9,0.6) 60%, transparent)" }}
       >
         <button
           disabled={busy}
           onClick={download}
           className="w-full max-w-md mx-auto flex items-center justify-center gap-2 py-4 rounded-full font-medium tracking-wide active:scale-[0.98] transition disabled:opacity-50"
           style={{
-            background: "#A0546A",
-            color: "#FFFFFF",
-            boxShadow: "0 8px 24px rgba(160,84,106,0.35), 0 0 20px rgba(196,114,138,0.2)",
+            background: "linear-gradient(135deg, #E8A0B4, #D4849C)",
+            color: "#120C10",
+            boxShadow: "0 8px 32px rgba(232,160,180,0.25), 0 0 24px rgba(212,132,156,0.15)",
             fontFamily: "'DM Sans', system-ui, sans-serif",
+            fontWeight: 600,
             letterSpacing: "0.03em",
           }}
         >
@@ -196,7 +194,7 @@ export function ShareYearDialog({ open, onClose, year }: Props) {
   );
 }
 
-/* ---------------- Share Card (1080×1350 portrait, Rose & Cream) ---------------- */
+/* ─── Share Card (1080×1920 portrait, Dark Rose) ─── */
 
 interface ShareCardProps {
   theme: ShareTheme;
@@ -216,9 +214,9 @@ const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
     const gridW = 53 * colW - GAP;
     const displayName = (userName || "").trim() || "Foodie";
 
-    const sansStack = "'DM Sans', system-ui, -apple-system, sans-serif";
-    const displayStack = "'Cormorant Garamond', Georgia, serif";
-    const monoStack = "'DM Mono', ui-monospace, monospace";
+    const sans = "'DM Sans', system-ui, -apple-system, sans-serif";
+    const display = "'Cormorant Garamond', Georgia, serif";
+    const mono = "'DM Mono', ui-monospace, monospace";
 
     return (
       <div
@@ -228,133 +226,137 @@ const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
           height: CARD_H,
           background: t.bg,
           color: t.text,
-          fontFamily: sansStack,
+          fontFamily: sans,
           position: "relative",
           boxSizing: "border-box",
           overflow: "hidden",
           display: "flex",
           flexDirection: "column",
-          padding: "80px 72px 64px",
+          padding: "0",
         }}
       >
-        {/* Decorative soft rose orb (top-right) */}
+        {/* Decorative gradient orbs */}
         <div
           style={{
             position: "absolute",
-            top: -180, right: -160,
-            width: 520, height: 520,
+            top: -250, right: -200,
+            width: 600, height: 600,
             borderRadius: "50%",
-            background: "#FAF0F3",
-            opacity: 0.85,
+            background: "radial-gradient(circle, rgba(232,160,180,0.08) 0%, transparent 70%)",
             zIndex: 1,
           }}
         />
-        {/* Decorative blush orb (bottom-left) */}
         <div
           style={{
             position: "absolute",
-            bottom: -200, left: -180,
-            width: 460, height: 460,
+            bottom: -300, left: -200,
+            width: 700, height: 700,
             borderRadius: "50%",
-            background: "#FDF5F7",
-            opacity: 0.7,
+            background: "radial-gradient(circle, rgba(122,174,148,0.06) 0%, transparent 70%)",
             zIndex: 1,
           }}
         />
 
-        {/* ---------- Top: Brand chip ---------- */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", zIndex: 2 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-            <div style={{
-              width: 56, height: 56, borderRadius: 16,
-              background: "#A0546A",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: 30,
-              boxShadow: "0 6px 16px rgba(160,84,106,0.25)",
-            }}>🍛</div>
-            <div>
+        {/* ── Top section ── */}
+        <div style={{ padding: "80px 72px 0", zIndex: 2 }}>
+          {/* Brand + Year */}
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
               <div style={{
-                fontFamily: displayStack,
-                fontSize: 30, fontWeight: 600, letterSpacing: -0.4, lineHeight: 1,
-                fontStyle: "italic",
-              }}>
-                Thali
-              </div>
-              <div style={{
-                fontFamily: monoStack,
-                fontSize: 11, color: t.textMuted, marginTop: 6,
-                letterSpacing: 2, textTransform: "uppercase",
-              }}>
-                Indian calorie tracker
+                fontSize: 32,
+                width: 52, height: 52,
+                borderRadius: 14,
+                background: "rgba(232,160,180,0.12)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+              }}>🍛</div>
+              <div>
+                <div style={{
+                  fontFamily: display, fontSize: 28, fontWeight: 600,
+                  fontStyle: "italic", letterSpacing: -0.3, lineHeight: 1,
+                  color: t.accent,
+                }}>Thali</div>
+                <div style={{
+                  fontFamily: mono, fontSize: 10, color: t.textMuted,
+                  letterSpacing: 2.5, textTransform: "uppercase", marginTop: 6,
+                }}>Indian calorie tracker</div>
               </div>
             </div>
+            <div style={{
+              fontFamily: mono, fontSize: 48, fontWeight: 500,
+              color: t.textSubtle, letterSpacing: -1,
+            }}>{year}</div>
           </div>
-          <div style={{
-            fontFamily: monoStack,
-            fontSize: 14, fontWeight: 500, letterSpacing: 3,
-            color: t.accent, padding: "10px 20px", borderRadius: 999,
-            background: t.accentSoft,
-            border: `1px solid ${t.border}`,
-          }}>
-            {year}
-          </div>
-        </div>
 
-        {/* ---------- Title block ---------- */}
-        <div style={{ marginTop: 72, zIndex: 2 }}>
+          {/* Divider */}
           <div style={{
-            fontFamily: monoStack,
-            fontSize: 13, color: t.textMuted, letterSpacing: 6,
-            fontWeight: 500, textTransform: "uppercase",
-          }}>
-            My Year in Calories
-          </div>
+            height: 1, background: t.divider,
+            margin: "48px 0 52px",
+          }} />
+
+          {/* Name + subtitle */}
           <div style={{
-            fontFamily: displayStack,
-            fontSize: 132, fontWeight: 600, marginTop: 18,
-            letterSpacing: -2, lineHeight: 0.95,
-            fontStyle: "italic",
-            color: t.text,
-          }}>
-            {displayName}
-          </div>
+            fontFamily: mono, fontSize: 11, color: t.textMuted,
+            letterSpacing: 5, textTransform: "uppercase", fontWeight: 500,
+          }}>My Year in Calories</div>
           <div style={{
-            fontFamily: monoStack,
-            fontSize: 14, color: t.textMuted, marginTop: 18,
-            letterSpacing: 1.5,
+            fontFamily: display, fontSize: 120, fontWeight: 600,
+            fontStyle: "italic", lineHeight: 0.95, marginTop: 20,
+            color: t.text, letterSpacing: -2,
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+          }}>{displayName}</div>
+          <div style={{
+            fontFamily: mono, fontSize: 13, color: t.textMuted,
+            letterSpacing: 1.5, marginTop: 20,
           }}>
             {goal.toLocaleString()} kcal · daily goal
           </div>
         </div>
 
-        {/* ---------- Heatmap card ---------- */}
+        {/* ── Stats row ── */}
         <div style={{
-          marginTop: 48,
-          padding: "36px 32px 30px",
+          display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr",
+          gap: 1, margin: "52px 72px 0",
+          background: t.divider, borderRadius: 20, overflow: "hidden",
+          zIndex: 2,
+        }}>
+          <StatCell t={t} value={`${stats.streak}`} label="Streak" unit="days" />
+          <StatCell t={t} value={`${stats.loggedDays}`} label="Logged" unit={`of ${stats.totalDays}`} />
+          <StatCell t={t} value={`${stats.onGoalPct}%`} label="On Goal" accent />
+          <StatCell
+            t={t}
+            value={stats.bestDay ? stats.bestDay.kcal.toLocaleString() : "—"}
+            label="Best Day"
+            unit={stats.bestDay ? format(parseISO(stats.bestDay.date), "MMM d") : ""}
+          />
+        </div>
+
+        {/* ── Heatmap ── */}
+        <div style={{
+          margin: "44px 72px 0",
+          padding: "36px 36px 28px",
           background: t.surface,
           border: `1px solid ${t.border}`,
           borderRadius: 24,
           display: "flex", flexDirection: "column", alignItems: "center",
-          boxShadow: "0 4px 30px rgba(160,84,106,0.06)",
           zIndex: 2,
         }}>
-          {/* month labels */}
+          {/* Month labels */}
           <div style={{ display: "flex", width: gridW, marginBottom: 10 }}>
             {grid.map((_, i) => {
               const m = months.find((mm) => mm.col === i);
               return (
                 <div key={i} style={{
-                  width: colW,
-                  fontFamily: monoStack,
-                  fontSize: 10,
-                  color: t.textMuted,
-                  letterSpacing: 0.5,
+                  width: colW, fontFamily: mono,
+                  fontSize: 10, color: t.textMuted, letterSpacing: 0.5,
                 }}>
                   {m?.label ?? ""}
                 </div>
               );
             })}
           </div>
+          {/* Grid */}
           <div style={{ display: "flex", gap: GAP }}>
             {grid.map((col, ci) => (
               <div key={ci} style={{ display: "flex", flexDirection: "column", gap: GAP }}>
@@ -366,7 +368,7 @@ const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
                       style={{
                         width: SQ, height: SQ, borderRadius: 3,
                         background: colorFor(cell, t.palette),
-                        opacity: cell.inYear ? 1 : 0.45,
+                        opacity: cell.inYear ? 1 : 0.3,
                         boxShadow: today ? `inset 0 0 0 1.5px ${t.palette.todayBorder}` : undefined,
                       }}
                     />
@@ -375,69 +377,55 @@ const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
               </div>
             ))}
           </div>
-
-          {/* Legend inline below grid — two states */}
+          {/* Legend */}
           <div style={{
-            display: "flex", alignItems: "center", justifyContent: "center", gap: 28,
-            marginTop: 24,
-            fontFamily: monoStack,
-            fontSize: 11, color: t.textMuted, letterSpacing: 1.2,
+            display: "flex", alignItems: "center", justifyContent: "center", gap: 32,
+            marginTop: 22, fontFamily: mono,
+            fontSize: 10, color: t.textMuted, letterSpacing: 1.5,
             textTransform: "uppercase",
           }}>
-            <LegendChip c={t.palette.on_track[2]} label="On goal" t={t} />
-            <LegendChip c={t.palette.over[2]} label="Over goal" t={t} />
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+              <span style={{ width: 10, height: 10, borderRadius: 3, background: t.palette.on_track[2], display: "inline-block" }} />
+              On goal
+            </span>
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+              <span style={{ width: 10, height: 10, borderRadius: 3, background: t.palette.over[2], display: "inline-block" }} />
+              Over goal
+            </span>
           </div>
         </div>
 
-        {/* ---------- Stats grid (2×2, editorial display numbers) ---------- */}
+        {/* ── Footer ── */}
         <div style={{
-          display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18, marginTop: 30, zIndex: 2,
-        }}>
-          <ShareStat t={t} label="Current streak" value={`${stats.streak}`} unit="days" />
-          <ShareStat t={t} label="Days logged" value={`${stats.loggedDays}`} unit={`/ ${stats.totalDays}`} />
-          <ShareStat t={t} label="On goal" value={`${stats.onGoalPct}%`} unit="of days" />
-          <ShareStat
-            t={t}
-            label="Best day"
-            value={stats.bestDay ? stats.bestDay.kcal.toLocaleString() : "—"}
-            unit={stats.bestDay ? `kcal · ${format(parseISO(stats.bestDay.date), "MMM d")}` : "no data"}
-          />
-        </div>
-
-        {/* ---------- Footer ---------- */}
-        <div style={{
-          marginTop: "auto", paddingTop: 32,
-          display: "flex", alignItems: "center", justifyContent: "space-between",
-          borderTop: `1px solid ${t.divider}`,
+          marginTop: "auto",
+          padding: "0 72px 72px",
+          display: "flex", alignItems: "flex-end", justifyContent: "space-between",
           zIndex: 2,
         }}>
-          <div style={{ lineHeight: 1.6 }}>
+          <div>
             <div style={{
-              fontFamily: sansStack,
-              fontSize: 13, color: t.textMuted, fontWeight: 400,
+              fontFamily: sans, fontSize: 13, color: t.textMuted, fontWeight: 400,
             }}>
               Tracked with{" "}
               <span style={{
-                fontFamily: displayStack,
-                color: t.accent, fontWeight: 600, fontStyle: "italic", fontSize: 16,
-              }}>
-                Thali
-              </span>{" "}
-              🍛
+                fontFamily: display, color: t.accent, fontWeight: 600,
+                fontStyle: "italic", fontSize: 16,
+              }}>Thali</span>
+              {" "}🍛
             </div>
             <div style={{
-              fontFamily: monoStack,
-              fontSize: 10, color: t.textSubtle, letterSpacing: 1, marginTop: 4,
+              fontFamily: mono, fontSize: 10, color: t.textSubtle,
+              letterSpacing: 1, marginTop: 6,
             }}>
-              Powered by IFCT 2017 · NIN, Hyderabad 🇮🇳
+              IFCT 2017 · NIN, Hyderabad 🇮🇳
             </div>
           </div>
           <div style={{
-            fontFamily: monoStack,
-            fontSize: 11, color: t.accent, fontWeight: 500, letterSpacing: 2,
-            padding: "8px 16px", borderRadius: 999,
+            fontFamily: mono, fontSize: 11, color: t.accent,
+            fontWeight: 500, letterSpacing: 2,
+            padding: "8px 18px", borderRadius: 999,
             border: `1px solid ${t.border}`,
-            background: t.accentSoft,
+            background: "rgba(232,160,180,0.06)",
           }}>
             mythali.app
           </div>
@@ -448,47 +436,34 @@ const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
 );
 ShareCard.displayName = "ShareCard";
 
-function ShareStat({ t, label, value, unit }: { t: ShareTheme; label: string; value: string; unit: string }) {
-  const sansStack = "'DM Sans', system-ui, -apple-system, sans-serif";
-  const displayStack = "'Cormorant Garamond', Georgia, serif";
-  const monoStack = "'DM Mono', ui-monospace, monospace";
+function StatCell({
+  t, value, label, unit, accent,
+}: { t: ShareTheme; value: string; label: string; unit?: string; accent?: boolean }) {
+  const display = "'Cormorant Garamond', Georgia, serif";
+  const mono = "'DM Mono', ui-monospace, monospace";
+  const sans = "'DM Sans', system-ui, -apple-system, sans-serif";
   return (
     <div style={{
       background: t.surface,
-      border: `1px solid ${t.border}`,
-      borderRadius: 20,
-      padding: "24px 26px",
-      boxShadow: "0 2px 16px rgba(160,84,106,0.05)",
+      padding: "28px 20px 24px",
+      display: "flex", flexDirection: "column", alignItems: "center",
+      textAlign: "center",
     }}>
       <div style={{
-        fontFamily: monoStack,
-        fontSize: 10, color: t.textMuted, fontWeight: 500,
-        letterSpacing: 2, textTransform: "uppercase",
-      }}>
-        {label}
-      </div>
+        fontFamily: mono, fontSize: 9, color: t.textMuted, fontWeight: 500,
+        letterSpacing: 2.5, textTransform: "uppercase", marginBottom: 10,
+      }}>{label}</div>
       <div style={{
-        fontFamily: displayStack,
-        fontSize: 64, fontWeight: 600, color: t.accent,
-        lineHeight: 1.05, marginTop: 10, letterSpacing: -1.5,
-      }}>
-        {value}
-      </div>
-      <div style={{
-        fontFamily: sansStack,
-        fontSize: 13, color: t.textMuted, marginTop: 4, fontWeight: 400,
-      }}>
-        {unit}
-      </div>
+        fontFamily: display, fontSize: 48, fontWeight: 600,
+        color: accent ? "#7AAE94" : t.accent,
+        lineHeight: 1, letterSpacing: -1.5,
+      }}>{value}</div>
+      {unit && (
+        <div style={{
+          fontFamily: sans, fontSize: 11, color: t.textSubtle,
+          marginTop: 8, fontWeight: 400,
+        }}>{unit}</div>
+      )}
     </div>
-  );
-}
-
-function LegendChip({ c, label, t }: { c: string; label: string; t: ShareTheme }) {
-  return (
-    <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
-      <span style={{ width: 11, height: 11, borderRadius: 3, background: c, display: "inline-block" }} />
-      <span style={{ color: t.textMuted }}>{label}</span>
-    </span>
   );
 }
