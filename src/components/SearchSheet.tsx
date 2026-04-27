@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { Search, X, Plus, Sparkles } from "lucide-react";
 import { IFCT_FOODS, CATEGORY_META, FoodCategory, FoodItem } from "@/data/ifct";
 import { calcNutrition, MealType, todayStr, useStore } from "@/store/useStore";
@@ -106,6 +107,7 @@ export const SearchSheet = ({ open, onClose, defaultMeal, onAddCustom, date }: P
   if (!open) return null;
 
   return (
+    <>
     <div className="fixed inset-0 z-[60] flex flex-col justify-end animate-fade-in" onClick={onClose}>
       <div className="absolute inset-0 bg-foreground/60 backdrop-blur-md" />
       <div
@@ -195,9 +197,10 @@ export const SearchSheet = ({ open, onClose, defaultMeal, onAddCustom, date }: P
           </button>
         </div>
       </div>
+    </div>
 
-      {/* Selected food action panel — bottom-anchored sheet for reliable mobile display */}
-      {selected && (
+      {/* Portal: renders at document.body to escape parent transform context */}
+      {selected && createPortal(
         <div
           className="fixed inset-0 z-[80] flex flex-col justify-end animate-fade-in"
           onClick={() => setSelected(null)}
@@ -265,9 +268,10 @@ export const SearchSheet = ({ open, onClose, defaultMeal, onAddCustom, date }: P
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
-    </div>
+    </>
   );
 };
 
