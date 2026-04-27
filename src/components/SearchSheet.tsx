@@ -202,8 +202,8 @@ export const SearchSheet = ({ open, onClose, defaultMeal, onAddCustom }: Props) 
         >
           <div className="absolute inset-0 bg-foreground/70 backdrop-blur-md" />
           <div
-            className="relative w-full sm:max-w-sm bg-card rounded-t-[24px] sm:rounded-[24px] shadow-elevated animate-slide-up flex flex-col"
-            style={{ maxHeight: "90dvh" }}
+            className="relative w-full sm:max-w-sm bg-card rounded-t-[24px] sm:rounded-[24px] shadow-elevated animate-slide-up flex flex-col mb-[88px] sm:mb-0"
+            style={{ maxHeight: "calc(90dvh - 88px)" }}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="w-10 h-1 bg-muted rounded-full mx-auto mt-2 mb-1 sm:hidden flex-shrink-0" />
