@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { format, parseISO } from "date-fns";
-import { Flame, Calendar, Target, Zap, Share2 } from "lucide-react";
+import { Flame, Calendar, Target, Zap } from "lucide-react";
 import { useStore } from "@/store/useStore";
 import {
   buildYearGrid,
@@ -11,7 +11,7 @@ import {
   isToday,
   type DayCell,
 } from "@/lib/yearHeatmap";
-import { ShareYearDialog } from "./ShareYearDialog";
+
 
 const SQUARE = 12;       // desktop px (incl gap calc); we use w-3 h-3
 const SQUARE_MOBILE = 10;
@@ -20,7 +20,6 @@ export function YearHeatmap() {
   const { logs, settings } = useStore();
   const [year, setYear] = useState(new Date().getFullYear());
   const [hover, setHover] = useState<{ cell: DayCell; x: number; y: number } | null>(null);
-  const [shareOpen, setShareOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const isDark = settings.darkMode;
@@ -69,13 +68,7 @@ export function YearHeatmap() {
               {years.map((y) => <option key={y} value={y}>{y}</option>)}
             </select>
           )}
-          <button
-            onClick={() => setShareOpen(true)}
-            className="flex items-center gap-1.5 text-xs font-semibold bg-gradient-to-r from-primary to-primary-glow text-primary-foreground rounded-lg px-3 py-1.5 shadow-sm hover:opacity-90 active:scale-95 transition"
-          >
-            <Share2 className="w-3.5 h-3.5" />
-            Share
-          </button>
+
         </div>
       </div>
 
@@ -160,7 +153,7 @@ export function YearHeatmap() {
         <Tooltip x={hover.x} y={hover.y} cell={hover.cell} />
       )}
 
-      <ShareYearDialog open={shareOpen} onClose={() => setShareOpen(false)} year={year} />
+
     </div>
   );
 }
