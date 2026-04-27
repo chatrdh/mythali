@@ -206,8 +206,7 @@ export const SearchSheet = ({ open, onClose, defaultMeal, onAddCustom }: Props) 
             style={{ maxHeight: "calc(90dvh - 88px)" }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="w-10 h-1 bg-muted rounded-full mx-auto mt-2 mb-1 sm:hidden flex-shrink-0" />
-            <div className="overflow-y-auto px-4 pt-3 pb-2 flex-1 min-h-0">
+            <div className="overflow-y-auto px-4 pt-4 pb-2 flex-1 min-h-0">
               <div className="flex items-start justify-between mb-3">
                 <div className="min-w-0 pr-2">
                   <div className="font-display italic text-lg leading-tight truncate">{selected.name}</div>
