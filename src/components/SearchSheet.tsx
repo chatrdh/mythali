@@ -104,8 +104,8 @@ export const SearchSheet = ({ open, onClose, defaultMeal, onAddCustom }: Props) 
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col justify-end animate-fade-in" onClick={onClose}>
-      <div className="absolute inset-0 bg-foreground/40 backdrop-blur-sm" />
+    <div className="fixed inset-0 z-[60] flex flex-col justify-end animate-fade-in" onClick={onClose}>
+      <div className="absolute inset-0 bg-foreground/60 backdrop-blur-md" />
       <div
         className="relative bg-card rounded-t-[28px] h-[88vh] flex flex-col animate-slide-up shadow-elevated"
         onClick={(e) => e.stopPropagation()}
