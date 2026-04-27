@@ -2,6 +2,8 @@ import { useMemo, useState } from "react";
 import { addDays, format, startOfDay } from "date-fns";
 import { MealType, useStore } from "@/store/useStore";
 import { MealSectionCard } from "@/components/MealSectionCard";
+import { SearchSheet } from "@/components/SearchSheet";
+import { CustomFoodSheet } from "@/components/CustomFoodSheet";
 import { cn } from "@/lib/utils";
 
 const MEALS: MealType[] = ["BREAKFAST", "LUNCH", "DINNER", "SNACKS"];
@@ -14,6 +16,8 @@ export default function History() {
     return Array.from({ length: 7 }, (_, i) => addDays(today, -6 + i - offset * 7));
   }, [offset]);
   const [selected, setSelected] = useState(() => format(new Date(), "yyyy-MM-dd"));
+  const [sheet, setSheet] = useState<{ open: boolean; meal: MealType }>({ open: false, meal: "BREAKFAST" });
+  const [customOpen, setCustomOpen] = useState(false);
 
   const dayLogs = logs.filter((l) => l.date === selected);
   const dayTotal = dayLogs.reduce((a, l) => a + l.calories, 0);
@@ -48,9 +52,22 @@ export default function History() {
 
       <div className="space-y-3">
         {MEALS.map((m) => (
-          <MealSectionCard key={m} meal={m} logs={dayLogs.filter((l) => l.mealType === m)} onAdd={() => {}} />
+          <MealSectionCard
+            key={m}
+            meal={m}
+            logs={dayLogs.filter((l) => l.mealType === m)}
+            onAdd={(meal) => setSheet({ open: true, meal })}
+          />
         ))}
       </div>
+
+      <SearchSheet
+        open={sheet.open}
+        defaultMeal={sheet.meal}
+        onClose={() => setSheet((s) => ({ ...s, open: false }))}
+        onAddCustom={() => { setSheet((s) => ({ ...s, open: false })); setCustomOpen(true); }}
+      />
+      <CustomFoodSheet open={customOpen} onClose={() => setCustomOpen(false)} />
     </div>
   );
 }
