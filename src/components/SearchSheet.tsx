@@ -196,20 +196,22 @@ export const SearchSheet = ({ open, onClose, defaultMeal, onAddCustom, date }: P
         </div>
       </div>
 
-      {/* Selected food action panel — rendered as its own overlay so it's always reachable */}
+      {/* Selected food action panel — bottom-anchored sheet for reliable mobile display */}
       {selected && (
         <div
-          className="fixed inset-0 z-[80] flex items-center justify-center animate-fade-in"
+          className="fixed inset-0 z-[80] flex flex-col justify-end animate-fade-in"
           onClick={() => setSelected(null)}
         >
           <div className="absolute inset-0 bg-foreground/70 backdrop-blur-md" />
           <div
-            className="relative w-[calc(100%-32px)] max-w-sm bg-card rounded-[24px] shadow-elevated animate-scale-in flex flex-col"
-            style={{ maxHeight: "80dvh" }}
+            className="relative w-full bg-card rounded-t-[24px] shadow-elevated animate-slide-up flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="overflow-y-auto px-4 pt-4 pb-2 flex-1 min-h-0">
-              <div className="flex items-start justify-between mb-3">
+            {/* Drag handle */}
+            <div className="w-10 h-1 bg-muted rounded-full mx-auto mt-2.5 mb-1" />
+
+            <div className="px-5 pt-3 pb-3">
+              <div className="flex items-start justify-between mb-4">
                 <div className="min-w-0 pr-2">
                   <div className="font-display italic text-lg leading-tight truncate">{selected.name}</div>
                   <div className="text-xs text-muted-foreground truncate">{selected.regional}</div>
@@ -223,13 +225,13 @@ export const SearchSheet = ({ open, onClose, defaultMeal, onAddCustom, date }: P
                 </button>
               </div>
 
-              <div className="flex items-center gap-2 mb-3">
+              <div className="flex items-center gap-3 mb-4">
                 <input
                   type="number"
                   inputMode="decimal"
                   value={qty}
                   onChange={(e) => setQty(Math.max(0, Number(e.target.value) || 0))}
-                  className="w-24 px-3 py-2 rounded-xl bg-muted border-0 font-mono-num text-center focus:outline-none focus:ring-2 focus:ring-primary/40"
+                  className="w-24 px-3 py-2.5 rounded-xl bg-muted border-0 font-mono-num text-center focus:outline-none focus:ring-2 focus:ring-primary/40"
                 />
                 <span className="text-sm text-muted-foreground">{unitLabel}</span>
                 <div className="ml-auto text-right">
@@ -245,7 +247,7 @@ export const SearchSheet = ({ open, onClose, defaultMeal, onAddCustom, date }: P
                   const v = (calcNutrition(selected, qty) as any)[k] as number;
                   const emoji = { protein: "🥩", carbs: "🍞", fat: "🥑", fibre: "🌿" }[k];
                   return (
-                    <div key={k} className="bg-muted rounded-lg py-1.5">
+                    <div key={k} className="bg-muted rounded-lg py-2">
                       <div className="text-sm">{emoji}</div>
                       <div className="font-mono-num text-xs font-semibold">{v.toFixed(1)}g</div>
                     </div>
@@ -254,7 +256,7 @@ export const SearchSheet = ({ open, onClose, defaultMeal, onAddCustom, date }: P
               </div>
             </div>
 
-            <div className="flex-shrink-0 px-4 pt-2 pb-4 bg-card border-t border-border/50 rounded-b-[24px]">
+            <div className="flex-shrink-0 px-5 pt-3 pb-8 bg-card border-t border-border/50">
               <button
                 onClick={handleAdd}
                 className="w-full py-3.5 rounded-xl bg-gradient-primary text-primary-foreground font-semibold flex items-center justify-center gap-1.5 shadow-elevated active:scale-[0.98] transition"
