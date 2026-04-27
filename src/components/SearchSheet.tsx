@@ -107,7 +107,8 @@ export const SearchSheet = ({ open, onClose, defaultMeal, onAddCustom }: Props) 
     <div className="fixed inset-0 z-[60] flex flex-col justify-end animate-fade-in" onClick={onClose}>
       <div className="absolute inset-0 bg-foreground/60 backdrop-blur-md" />
       <div
-        className="relative bg-card rounded-t-[28px] h-[88vh] flex flex-col animate-slide-up shadow-elevated"
+        className="relative bg-card rounded-t-[28px] flex flex-col animate-slide-up shadow-elevated"
+        style={{ height: "88dvh", maxHeight: "88dvh" }}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex-shrink-0 pt-2">
@@ -151,7 +152,7 @@ export const SearchSheet = ({ open, onClose, defaultMeal, onAddCustom }: Props) 
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-2 pb-4">
+        <div className="flex-1 overflow-y-auto px-2 pb-4 min-h-0">
           {!query && category === "All" && (recent.length > 0 || frequent.length > 0) && (
             <div className="space-y-3 px-2 py-2">
               {recent.length > 0 && <HorizRow title="🕐 Recently logged" items={recent} onPick={pickFood} />}
@@ -191,50 +192,75 @@ export const SearchSheet = ({ open, onClose, defaultMeal, onAddCustom }: Props) 
             <Sparkles className="w-4 h-4" /> Can't find it? Add custom food
           </button>
         </div>
-
-        {selected && (
-          <div className="flex-shrink-0 border-t border-border bg-card p-4 safe-bottom animate-slide-up">
-            <div className="flex items-start justify-between mb-2">
-              <div className="min-w-0">
-                <div className="font-semibold truncate">{selected.name}</div>
-                <div className="text-xs text-muted-foreground truncate">{selected.regional}</div>
-              </div>
-              <button onClick={() => setSelected(null)} className="text-xs text-muted-foreground ml-2">Clear</button>
-            </div>
-
-            <div className="flex items-center gap-2 mb-3">
-              <input type="number" inputMode="decimal" value={qty}
-                onChange={(e) => setQty(Math.max(0, Number(e.target.value) || 0))}
-                className="w-24 px-3 py-2 rounded-xl bg-muted border-0 font-mono-num text-center focus:outline-none focus:ring-2 focus:ring-primary/40" />
-              <span className="text-sm text-muted-foreground">{unitLabel}</span>
-              <div className="ml-auto text-right">
-                <div className="font-mono-num text-lg font-bold text-primary">
-                  {Math.round(calcNutrition(selected, qty).calories)}
-                </div>
-                <div className="text-[10px] text-muted-foreground">kcal</div>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-4 gap-2 mb-3 text-center">
-              {(["protein","carbs","fat","fibre"] as const).map((k) => {
-                const v = (calcNutrition(selected, qty) as any)[k] as number;
-                const emoji = { protein: "🥩", carbs: "🍞", fat: "🥑", fibre: "🌿" }[k];
-                return (
-                  <div key={k} className="bg-muted rounded-lg py-1.5">
-                    <div className="text-sm">{emoji}</div>
-                    <div className="font-mono-num text-xs font-semibold">{v.toFixed(1)}g</div>
-                  </div>
-                );
-              })}
-            </div>
-
-            <button onClick={handleAdd}
-              className="w-full py-3 rounded-xl bg-gradient-primary text-primary-foreground font-semibold flex items-center justify-center gap-1.5 shadow-elevated active:scale-[0.98] transition">
-              <Plus className="w-4 h-4" /> Add to {MEAL_LABELS[meal]}
-            </button>
-          </div>
-        )}
       </div>
+
+      {/* Selected food action panel — rendered as its own overlay so it's always reachable */}
+      {selected && (
+        <div
+          className="fixed inset-0 z-[70] flex items-end sm:items-center justify-center animate-fade-in"
+          onClick={() => setSelected(null)}
+        >
+          <div className="absolute inset-0 bg-foreground/70 backdrop-blur-md" />
+          <div
+            className="relative w-full sm:max-w-sm bg-card rounded-t-[24px] sm:rounded-[24px] shadow-elevated animate-slide-up safe-bottom"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="w-10 h-1 bg-muted rounded-full mx-auto mt-2 mb-1 sm:hidden" />
+            <div className="p-4">
+              <div className="flex items-start justify-between mb-3">
+                <div className="min-w-0 pr-2">
+                  <div className="font-display italic text-lg leading-tight truncate">{selected.name}</div>
+                  <div className="text-xs text-muted-foreground truncate">{selected.regional}</div>
+                </div>
+                <button
+                  onClick={() => setSelected(null)}
+                  className="flex-shrink-0 p-1.5 rounded-full hover:bg-muted text-muted-foreground"
+                  aria-label="Close"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              <div className="flex items-center gap-2 mb-3">
+                <input
+                  type="number"
+                  inputMode="decimal"
+                  value={qty}
+                  onChange={(e) => setQty(Math.max(0, Number(e.target.value) || 0))}
+                  className="w-24 px-3 py-2 rounded-xl bg-muted border-0 font-mono-num text-center focus:outline-none focus:ring-2 focus:ring-primary/40"
+                />
+                <span className="text-sm text-muted-foreground">{unitLabel}</span>
+                <div className="ml-auto text-right">
+                  <div className="font-mono-num text-2xl font-bold text-primary leading-none">
+                    {Math.round(calcNutrition(selected, qty).calories)}
+                  </div>
+                  <div className="font-mono-num text-[10px] uppercase tracking-wider text-muted-foreground mt-0.5">kcal</div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-4 gap-2 mb-4 text-center">
+                {(["protein","carbs","fat","fibre"] as const).map((k) => {
+                  const v = (calcNutrition(selected, qty) as any)[k] as number;
+                  const emoji = { protein: "🥩", carbs: "🍞", fat: "🥑", fibre: "🌿" }[k];
+                  return (
+                    <div key={k} className="bg-muted rounded-lg py-1.5">
+                      <div className="text-sm">{emoji}</div>
+                      <div className="font-mono-num text-xs font-semibold">{v.toFixed(1)}g</div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <button
+                onClick={handleAdd}
+                className="w-full py-3.5 rounded-xl bg-gradient-primary text-primary-foreground font-semibold flex items-center justify-center gap-1.5 shadow-elevated active:scale-[0.98] transition"
+              >
+                <Plus className="w-4 h-4" /> Add to {MEAL_LABELS[meal]}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
