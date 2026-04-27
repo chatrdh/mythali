@@ -252,10 +252,7 @@ export const SearchSheet = ({ open, onClose, defaultMeal, onAddCustom }: Props) 
               </div>
             </div>
 
-            <div
-              className="flex-shrink-0 px-4 pt-2 bg-card border-t border-border/50"
-              style={{ paddingBottom: "max(env(safe-area-inset-bottom), 16px)" }}
-            >
+            <div className="flex-shrink-0 px-4 pt-2 pb-4 bg-card border-t border-border/50 rounded-b-[24px]">
               <button
                 onClick={handleAdd}
                 className="w-full py-3.5 rounded-xl bg-gradient-primary text-primary-foreground font-semibold flex items-center justify-center gap-1.5 shadow-elevated active:scale-[0.98] transition"
