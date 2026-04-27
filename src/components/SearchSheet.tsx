@@ -25,18 +25,16 @@ export const SearchSheet = ({ open, onClose, defaultMeal, onAddCustom }: Props) 
   const [selected, setSelected] = useState<FoodItem | null>(null);
   const [qty, setQty] = useState(100);
   const inputRef = useRef<HTMLInputElement>(null);
-  const [hasFocused, setHasFocused] = useState(false);
 
   useEffect(() => {
     if (open) {
       setMeal(defaultMeal);
-      setHasFocused(false);
-      // Defensive: blur any focused element when sheet opens
+      // Defensive: blur any focused element when sheet opens (prevents iOS keyboard popping)
       if (typeof document !== "undefined" && document.activeElement instanceof HTMLElement) {
         document.activeElement.blur();
       }
     } else {
-      setQuery(""); setSelected(null); setCategory("All"); setQty(100); setHasFocused(false);
+      setQuery(""); setSelected(null); setCategory("All"); setQty(100);
     }
   }, [open, defaultMeal]);
 
@@ -106,8 +104,8 @@ export const SearchSheet = ({ open, onClose, defaultMeal, onAddCustom }: Props) 
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col justify-end animate-fade-in" onClick={onClose}>
-      <div className="absolute inset-0 bg-foreground/40 backdrop-blur-sm" />
+    <div className="fixed inset-0 z-[60] flex flex-col justify-end animate-fade-in" onClick={onClose}>
+      <div className="absolute inset-0 bg-foreground/60 backdrop-blur-md" />
       <div
         className="relative bg-card rounded-t-[28px] h-[88vh] flex flex-col animate-slide-up shadow-elevated"
         onClick={(e) => e.stopPropagation()}
@@ -134,15 +132,11 @@ export const SearchSheet = ({ open, onClose, defaultMeal, onAddCustom }: Props) 
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <input
                 ref={inputRef}
+                type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search 100+ Indian foods…"
-                autoFocus={false}
-                tabIndex={-1}
-                readOnly={!hasFocused}
-                onFocus={() => setHasFocused(true)}
-                onTouchStart={() => setHasFocused(true)}
-                onClick={() => setHasFocused(true)}
+                enterKeyHint="search"
                 className="w-full pl-9 pr-3 py-3 rounded-xl bg-muted border-0 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
               />
             </div>
