@@ -33,7 +33,7 @@ export default defineConfig(({ mode }) => ({
       ],
       workbox: {
         globPatterns: ["**/*.{js,css,html,png,svg,ico,webmanifest,woff2}"],
-        navigateFallback: "/index.html",
+        navigateFallback: null,
         navigateFallbackDenylist: [/^\/~oauth/, /^\/api/],
         cleanupOutdatedCaches: true,
         runtimeCaching: [
