@@ -30,13 +30,12 @@ export const SearchSheet = ({ open, onClose, defaultMeal, onAddCustom }: Props) 
   useEffect(() => {
     if (open) {
       setMeal(defaultMeal);
-      setHasFocused(false);
-      // Defensive: blur any focused element when sheet opens
+      // Defensive: blur any focused element when sheet opens (prevents iOS keyboard popping)
       if (typeof document !== "undefined" && document.activeElement instanceof HTMLElement) {
         document.activeElement.blur();
       }
     } else {
-      setQuery(""); setSelected(null); setCategory("All"); setQty(100); setHasFocused(false);
+      setQuery(""); setSelected(null); setCategory("All"); setQty(100);
     }
   }, [open, defaultMeal]);
 
