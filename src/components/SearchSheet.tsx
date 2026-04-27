@@ -25,7 +25,6 @@ export const SearchSheet = ({ open, onClose, defaultMeal, onAddCustom }: Props) 
   const [selected, setSelected] = useState<FoodItem | null>(null);
   const [qty, setQty] = useState(100);
   const inputRef = useRef<HTMLInputElement>(null);
-  const [hasFocused, setHasFocused] = useState(false);
 
   useEffect(() => {
     if (open) {
