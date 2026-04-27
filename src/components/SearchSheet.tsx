@@ -197,16 +197,17 @@ export const SearchSheet = ({ open, onClose, defaultMeal, onAddCustom }: Props) 
       {/* Selected food action panel — rendered as its own overlay so it's always reachable */}
       {selected && (
         <div
-          className="fixed inset-0 z-[70] flex items-end sm:items-center justify-center animate-fade-in"
+          className="fixed inset-0 z-[80] flex items-end sm:items-center justify-center animate-fade-in"
           onClick={() => setSelected(null)}
         >
           <div className="absolute inset-0 bg-foreground/70 backdrop-blur-md" />
           <div
-            className="relative w-full sm:max-w-sm bg-card rounded-t-[24px] sm:rounded-[24px] shadow-elevated animate-slide-up safe-bottom"
+            className="relative w-full sm:max-w-sm bg-card rounded-t-[24px] sm:rounded-[24px] shadow-elevated animate-slide-up flex flex-col"
+            style={{ maxHeight: "90dvh" }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="w-10 h-1 bg-muted rounded-full mx-auto mt-2 mb-1 sm:hidden" />
-            <div className="p-4">
+            <div className="w-10 h-1 bg-muted rounded-full mx-auto mt-2 mb-1 sm:hidden flex-shrink-0" />
+            <div className="overflow-y-auto px-4 pt-3 pb-2 flex-1 min-h-0">
               <div className="flex items-start justify-between mb-3">
                 <div className="min-w-0 pr-2">
                   <div className="font-display italic text-lg leading-tight truncate">{selected.name}</div>
@@ -238,7 +239,7 @@ export const SearchSheet = ({ open, onClose, defaultMeal, onAddCustom }: Props) 
                 </div>
               </div>
 
-              <div className="grid grid-cols-4 gap-2 mb-4 text-center">
+              <div className="grid grid-cols-4 gap-2 text-center">
                 {(["protein","carbs","fat","fibre"] as const).map((k) => {
                   const v = (calcNutrition(selected, qty) as any)[k] as number;
                   const emoji = { protein: "🥩", carbs: "🍞", fat: "🥑", fibre: "🌿" }[k];
@@ -250,7 +251,12 @@ export const SearchSheet = ({ open, onClose, defaultMeal, onAddCustom }: Props) 
                   );
                 })}
               </div>
+            </div>
 
+            <div
+              className="flex-shrink-0 px-4 pt-2 bg-card border-t border-border/50"
+              style={{ paddingBottom: "max(env(safe-area-inset-bottom), 16px)" }}
+            >
               <button
                 onClick={handleAdd}
                 className="w-full py-3.5 rounded-xl bg-gradient-primary text-primary-foreground font-semibold flex items-center justify-center gap-1.5 shadow-elevated active:scale-[0.98] transition"
