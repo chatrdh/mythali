@@ -1,18 +1,23 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { lazy, Suspense, useEffect } from "react";
 import { HashRouter, Route, Routes, Navigate } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { useEffect } from "react";
 import Home from "./pages/Home";
-import History from "./pages/History";
-import Insights from "./pages/Insights";
-import Settings from "./pages/Settings";
-import Onboarding from "./pages/Onboarding";
-import NotFound from "./pages/NotFound";
 import { BottomNav } from "./components/BottomNav";
 import { useStore } from "./store/useStore";
 
-const queryClient = new QueryClient();
+// Lazy-load non-critical pages — keeps initial bundle small
+const History = lazy(() => import("./pages/History"));
+const Insights = lazy(() => import("./pages/Insights"));
+const Settings = lazy(() => import("./pages/Settings"));
+const Onboarding = lazy(() => import("./pages/Onboarding"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+
+const PageFallback = () => (
+  <div className="flex items-center justify-center h-[50vh]">
+    <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+  </div>
+);
 
 const Shell = () => {
   const done = useStore((s) => s.settings.onboardingDone);
@@ -24,36 +29,38 @@ const Shell = () => {
 
   if (!done) {
     return (
-      <Routes>
-        <Route path="*" element={<Onboarding />} />
-      </Routes>
+      <Suspense fallback={<PageFallback />}>
+        <Routes>
+          <Route path="*" element={<Onboarding />} />
+        </Routes>
+      </Suspense>
     );
   }
 
   return (
     <>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/history" element={<History />} />
-        <Route path="/insights" element={<Insights />} />
-        <Route path="/settings" element={<Settings />} />
-        <Route path="/onboarding" element={<Navigate to="/" replace />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
+      <Suspense fallback={<PageFallback />}>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/history" element={<History />} />
+          <Route path="/insights" element={<Insights />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/onboarding" element={<Navigate to="/" replace />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Suspense>
       <BottomNav />
     </>
   );
 };
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Sonner position="top-center" />
-      <HashRouter>
-        <Shell />
-      </HashRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+  <TooltipProvider>
+    <Sonner position="top-center" />
+    <HashRouter>
+      <Shell />
+    </HashRouter>
+  </TooltipProvider>
 );
 
 export default App;
