@@ -20,9 +20,7 @@ export default function Onboarding() {
       <div className="flex-1 flex flex-col justify-center">
         {step === 0 && (
           <div className="text-center animate-fade-in">
-            <div className="text-7xl mb-6">🍛</div>
-            <h1 className="text-3xl font-extrabold mb-2">Thali</h1>
-            <p className="text-muted-foreground text-lg">Your Indian food, tracked beautifully.</p>
+            <img src="./icon-192.png" alt="Thali" className="w-24 h-24 rounded-[22px] mx-auto mb-6 shadow-elevated" />
           </div>
         )}
         {step === 1 && (
