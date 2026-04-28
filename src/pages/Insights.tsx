@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Bar, BarChart, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis, PieChart, Pie } from "recharts";
+import { Cell, ResponsiveContainer, PieChart, Pie } from "recharts";
 import { addDays, format, startOfDay } from "date-fns";
 import { useStore } from "@/store/useStore";
 import { YearHeatmap } from "@/components/YearHeatmap";
@@ -53,47 +53,26 @@ export default function Insights() {
     return [...counts.values()].sort((a, b) => b.count - a.count).slice(0, 5);
   }, [logs]);
 
-  const barColor = (kcal: number) => {
-    const pct = kcal / settings.calorieGoal;
-    if (pct > 1) return "hsl(var(--destructive))";
-    if (pct > 0.9) return "hsl(var(--warning))";
-    return "hsl(var(--success))";
-  };
-
   return (
     <div className="max-w-2xl mx-auto pb-28 safe-top px-4 pt-4 space-y-4">
       <h1 className="text-xl font-bold">Insights</h1>
 
       <YearHeatmap />
 
-      <div className="rounded-2xl bg-card shadow-card p-4 border border-border/50">
-        <div className="flex items-center justify-between mb-2">
-          <div>
-            <div className="text-xs text-muted-foreground">7-day average</div>
-            <div className="font-mono-num text-2xl font-bold">{avg.toLocaleString()} <span className="text-xs font-normal text-muted-foreground">kcal/day</span></div>
-          </div>
-          <div className="text-right">
-            <div className="text-2xl">🔥</div>
-            <div className="text-xs font-semibold">{streak}-day streak</div>
-          </div>
-        </div>
-        <div className="h-40 mt-2">
-          <ResponsiveContainer>
-            <BarChart data={week}>
-              <XAxis dataKey="day" tickLine={false} axisLine={false} fontSize={11} />
-              <YAxis hide />
-              <Tooltip cursor={{ fill: "hsl(var(--muted))" }} contentStyle={{ borderRadius: 12, border: "none", boxShadow: "var(--shadow-card)" }} />
-              <Bar dataKey="kcal" radius={[8, 8, 0, 0]}>
-                {week.map((d) => <Cell key={d.key} fill={barColor(d.kcal)} />)}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
-
       {macros.length > 0 && (
         <div className="rounded-2xl bg-card shadow-card p-4 border border-border/50">
-          <div className="text-xs text-muted-foreground mb-1">Weekly macro split (kcal)</div>
+          <div className="flex items-center justify-between mb-3">
+            <div>
+              <div className="text-xs text-muted-foreground">Weekly macro split (kcal)</div>
+              <div className="font-mono-num text-lg font-bold mt-0.5">
+                {avg.toLocaleString()} <span className="text-xs font-normal text-muted-foreground">kcal/day avg</span>
+              </div>
+            </div>
+            <div className="text-right">
+              <div className="text-xl">🔥</div>
+              <div className="text-xs font-semibold">{streak}-day streak</div>
+            </div>
+          </div>
           <div className="h-48 flex items-center">
             <div className="w-1/2 h-full">
               <ResponsiveContainer>

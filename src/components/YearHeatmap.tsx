@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { format, parseISO } from "date-fns";
-import { Flame, Calendar, Target, Zap } from "lucide-react";
+import { Flame, Calendar, Target } from "lucide-react";
 import { useStore } from "@/store/useStore";
 import {
   buildYearGrid,
@@ -73,15 +73,10 @@ export function YearHeatmap() {
       </div>
 
       {/* Stats row */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+      <div className="grid grid-cols-3 gap-2">
         <StatCard icon={<Flame className="w-3.5 h-3.5" />} value={`${stats.streak}`} label="day streak" tone="primary" />
         <StatCard icon={<Calendar className="w-3.5 h-3.5" />} value={`${stats.loggedDays}`} label={`/ ${stats.totalDays} days`} />
         <StatCard icon={<Target className="w-3.5 h-3.5" />} value={`${stats.onGoalDays}`} label={`on goal (${stats.onGoalPct}%)`} tone="success" />
-        <StatCard
-          icon={<Zap className="w-3.5 h-3.5" />}
-          value={stats.bestDay ? `${stats.bestDay.kcal.toLocaleString()}` : "—"}
-          label={stats.bestDay ? `best · ${format(parseISO(stats.bestDay.date), "MMM d")}` : "no data"}
-        />
       </div>
 
       {/* Grid — sticky day labels on the left, horizontally-scrolling weeks on the right */}
