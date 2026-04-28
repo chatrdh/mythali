@@ -300,17 +300,20 @@ export const RecipeBuilderSheet = ({ open, onClose }: Props) => {
               </div>
             </div>
           )}
-        </div>
 
-        {/* Save button */}
-        <div className="flex-shrink-0 px-5 pt-3 pb-24 border-t border-border">
-          <button
-            onClick={save}
-            disabled={!name.trim() || ingredients.length < 2}
-            className="w-full py-3.5 rounded-xl bg-gradient-primary text-primary-foreground font-semibold flex items-center justify-center gap-1.5 shadow-elevated active:scale-[0.98] transition disabled:opacity-40"
-          >
-            <ChefHat className="w-4 h-4" /> Save recipe
-          </button>
+          {/* Save button — inline with content */}
+          {ingredients.length > 0 && (
+            <button
+              onClick={save}
+              disabled={!name.trim() || ingredients.length < 2}
+              className="w-full py-3.5 rounded-xl bg-gradient-primary text-primary-foreground font-semibold flex items-center justify-center gap-1.5 shadow-elevated active:scale-[0.98] transition disabled:opacity-40"
+            >
+              <ChefHat className="w-4 h-4" /> Save recipe
+            </button>
+          )}
+
+          {/* Bottom spacing for nav bar */}
+          <div className="h-6" />
         </div>
       </div>
     </div>
