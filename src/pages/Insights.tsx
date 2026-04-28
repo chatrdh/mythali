@@ -20,7 +20,6 @@ export default function Insights() {
   const avg = Math.round(week.reduce((a, d) => a + d.kcal, 0) / 7);
 
   const macros = useMemo(() => {
-    const today = format(new Date(), "yyyy-MM-dd");
     const weekKeys = new Set(week.map((w) => w.key));
     const weekLogs = logs.filter((l) => weekKeys.has(l.date));
     const p = weekLogs.reduce((a, l) => a + l.protein, 0);
@@ -33,7 +32,6 @@ export default function Insights() {
     ].filter((x) => x.value > 0);
   }, [logs, week]);
 
-
   const mostLogged = useMemo(() => {
     const counts = new Map<string, { name: string; count: number }>();
     logs.forEach((l) => {
@@ -43,22 +41,22 @@ export default function Insights() {
     return [...counts.values()].sort((a, b) => b.count - a.count).slice(0, 5);
   }, [logs]);
 
+  const totalKcal = macros.reduce((a, m) => a + m.value, 0);
+
   return (
     <div className="max-w-2xl mx-auto pb-28 safe-top px-4 pt-4 space-y-4">
       <h1 className="text-xl font-bold">Insights</h1>
 
       <YearHeatmap />
 
-      {macros.length > 0 && (() => {
-        const totalKcal = macros.reduce((a, m) => a + m.value, 0);
-        return (
-        <div className="rounded-2xl bg-card shadow-card p-5 border border-border/50">
-          <div className="flex items-baseline justify-between mb-4">
+      {macros.length > 0 && (
+        <div className="rounded-2xl bg-card shadow-card p-4 border border-border/50">
+          <div className="flex items-baseline justify-between mb-3">
             <div>
               <div className="font-mono-num text-[10px] uppercase tracking-[0.15em] text-muted-foreground">Weekly average</div>
-              <div className="font-mono-num text-3xl font-bold mt-1 leading-none">
+              <div className="font-mono-num text-2xl font-bold mt-1 leading-none">
                 {avg.toLocaleString()}
-                <span className="text-sm font-normal text-muted-foreground ml-1.5">kcal/day</span>
+                <span className="text-xs font-normal text-muted-foreground ml-1">kcal/day</span>
               </div>
             </div>
             <div className="text-right">
@@ -69,41 +67,36 @@ export default function Insights() {
             </div>
           </div>
 
-          <div className="h-48 flex items-center gap-2">
-            <div className="w-[45%] h-full">
+          <div className="flex justify-center">
+            <div className="w-40 h-40">
               <ResponsiveContainer>
                 <PieChart>
-                  <Pie data={macros} dataKey="value" innerRadius={44} outerRadius={72} paddingAngle={4} strokeWidth={0}>
+                  <Pie data={macros} dataKey="value" innerRadius={38} outerRadius={64} paddingAngle={4} strokeWidth={0}>
                     {macros.map((m) => <Cell key={m.name} fill={m.color} />)}
                   </Pie>
                 </PieChart>
               </ResponsiveContainer>
             </div>
-            <ul className="w-[55%] space-y-3">
-              {macros.map((m) => {
-                const pct = totalKcal > 0 ? Math.round((m.value / totalKcal) * 100) : 0;
-                const grams = m.name === "Fat" ? Math.round(m.value / 9) : Math.round(m.value / 4);
-                return (
-                  <li key={m.name}>
-                    <div className="flex items-center justify-between mb-0.5">
-                      <span className="flex items-center gap-2 text-sm font-medium">
-                        <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: m.color }} />
-                        {m.name}
-                      </span>
-                      <span className="font-mono-num text-sm font-semibold">{pct}%</span>
-                    </div>
-                    <div className="flex items-center justify-between pl-[18px]">
-                      <span className="font-mono-num text-[11px] text-muted-foreground">{grams}g</span>
-                      <span className="font-mono-num text-[11px] text-muted-foreground">{m.value} kcal</span>
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
+          </div>
+
+          <div className="grid grid-cols-3 gap-2 mt-3">
+            {macros.map((m) => {
+              const pct = totalKcal > 0 ? Math.round((m.value / totalKcal) * 100) : 0;
+              const grams = m.name === "Fat" ? Math.round(m.value / 9) : Math.round(m.value / 4);
+              return (
+                <div key={m.name} className="bg-muted/40 rounded-xl px-3 py-2.5 text-center">
+                  <div className="flex items-center justify-center gap-1.5 mb-1">
+                    <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: m.color }} />
+                    <span className="text-xs font-medium">{m.name}</span>
+                  </div>
+                  <div className="font-mono-num text-lg font-bold leading-none">{pct}%</div>
+                  <div className="font-mono-num text-[10px] text-muted-foreground mt-1">{grams}g · {m.value} kcal</div>
+                </div>
+              );
+            })}
           </div>
         </div>
-        );
-      })()}
+      )}
 
       {mostLogged.length > 0 && (
         <div className="rounded-2xl bg-card shadow-card p-4 border border-border/50">
