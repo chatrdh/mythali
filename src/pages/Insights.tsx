@@ -33,16 +33,6 @@ export default function Insights() {
     ].filter((x) => x.value > 0);
   }, [logs, week]);
 
-  const streak = useMemo(() => {
-    let s = 0;
-    for (let i = 0; ; i++) {
-      const key = format(addDays(new Date(), -i), "yyyy-MM-dd");
-      if (logs.some((l) => l.date === key)) s++;
-      else break;
-      if (s > 365) break;
-    }
-    return s;
-  }, [logs]);
 
   const mostLogged = useMemo(() => {
     const counts = new Map<string, { name: string; count: number }>();
@@ -59,44 +49,61 @@ export default function Insights() {
 
       <YearHeatmap />
 
-      {macros.length > 0 && (
-        <div className="rounded-2xl bg-card shadow-card p-4 border border-border/50">
-          <div className="flex items-center justify-between mb-3">
+      {macros.length > 0 && (() => {
+        const totalKcal = macros.reduce((a, m) => a + m.value, 0);
+        return (
+        <div className="rounded-2xl bg-card shadow-card p-5 border border-border/50">
+          <div className="flex items-baseline justify-between mb-4">
             <div>
-              <div className="text-xs text-muted-foreground">Weekly macro split (kcal)</div>
-              <div className="font-mono-num text-lg font-bold mt-0.5">
-                {avg.toLocaleString()} <span className="text-xs font-normal text-muted-foreground">kcal/day avg</span>
+              <div className="font-mono-num text-[10px] uppercase tracking-[0.15em] text-muted-foreground">Weekly average</div>
+              <div className="font-mono-num text-3xl font-bold mt-1 leading-none">
+                {avg.toLocaleString()}
+                <span className="text-sm font-normal text-muted-foreground ml-1.5">kcal/day</span>
               </div>
             </div>
             <div className="text-right">
-              <div className="text-xl">🔥</div>
-              <div className="text-xs font-semibold">{streak}-day streak</div>
+              <div className="font-mono-num text-sm font-semibold text-muted-foreground">
+                {Math.round(totalKcal).toLocaleString()}
+              </div>
+              <div className="text-[10px] text-muted-foreground">total kcal</div>
             </div>
           </div>
-          <div className="h-48 flex items-center">
-            <div className="w-1/2 h-full">
+
+          <div className="h-48 flex items-center gap-2">
+            <div className="w-[45%] h-full">
               <ResponsiveContainer>
                 <PieChart>
-                  <Pie data={macros} dataKey="value" innerRadius={40} outerRadius={70} paddingAngle={3}>
+                  <Pie data={macros} dataKey="value" innerRadius={44} outerRadius={72} paddingAngle={4} strokeWidth={0}>
                     {macros.map((m) => <Cell key={m.name} fill={m.color} />)}
                   </Pie>
                 </PieChart>
               </ResponsiveContainer>
             </div>
-            <ul className="w-1/2 space-y-1.5">
-              {macros.map((m) => (
-                <li key={m.name} className="flex items-center justify-between text-sm">
-                  <span className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full" style={{ background: m.color }} />
-                    {m.name}
-                  </span>
-                  <span className="font-mono-num">{m.value}</span>
-                </li>
-              ))}
+            <ul className="w-[55%] space-y-3">
+              {macros.map((m) => {
+                const pct = totalKcal > 0 ? Math.round((m.value / totalKcal) * 100) : 0;
+                const grams = m.name === "Fat" ? Math.round(m.value / 9) : Math.round(m.value / 4);
+                return (
+                  <li key={m.name}>
+                    <div className="flex items-center justify-between mb-0.5">
+                      <span className="flex items-center gap-2 text-sm font-medium">
+                        <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: m.color }} />
+                        {m.name}
+                      </span>
+                      <span className="font-mono-num text-sm font-semibold">{pct}%</span>
+                    </div>
+                    <div className="flex items-center justify-between pl-[18px]">
+                      <span className="font-mono-num text-[11px] text-muted-foreground">{grams}g</span>
+                      <span className="font-mono-num text-[11px] text-muted-foreground">{m.value} kcal</span>
+                    </div>
+                  </li>
+                );
+              })}
             </ul>
           </div>
         </div>
-      )}
+        );
+      })()}
 
       {mostLogged.length > 0 && (
         <div className="rounded-2xl bg-card shadow-card p-4 border border-border/50">
