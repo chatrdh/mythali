@@ -1,9 +1,10 @@
-import { lazy, Suspense, useEffect } from "react";
+import { lazy, Suspense, useCallback, useEffect, useState } from "react";
 import { HashRouter, Route, Routes, Navigate } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Home from "./pages/Home";
 import { BottomNav } from "./components/BottomNav";
+import { SplashScreen } from "./components/SplashScreen";
 import { useStore } from "./store/useStore";
 
 // Lazy-load non-critical pages — keeps initial bundle small
@@ -54,13 +55,19 @@ const Shell = () => {
   );
 };
 
-const App = () => (
-  <TooltipProvider>
-    <Sonner position="top-center" />
-    <HashRouter>
-      <Shell />
-    </HashRouter>
-  </TooltipProvider>
-);
+const App = () => {
+  const [splash, setSplash] = useState(true);
+  const hideSplash = useCallback(() => setSplash(false), []);
+
+  return (
+    <TooltipProvider>
+      <Sonner position="top-center" />
+      {splash && <SplashScreen onDone={hideSplash} />}
+      <HashRouter>
+        <Shell />
+      </HashRouter>
+    </TooltipProvider>
+  );
+};
 
 export default App;
