@@ -31,15 +31,28 @@ export interface Settings {
   onboardingDone: boolean;
 }
 
+export interface BodyMeasurement {
+  id: string;
+  date: string;       // YYYY-MM-DD
+  weight?: number;    // kg
+  waist?: number;     // cm
+  hips?: number;      // cm
+  chest?: number;     // cm
+  loggedAt: number;
+}
+
 interface Store {
   logs: FoodLog[];
   customFoods: FoodItem[];
+  measurements: BodyMeasurement[];
   settings: Settings;
   addLog: (log: Omit<FoodLog, "id" | "loggedAt">) => void;
   removeLog: (id: string) => void;
   updateLogQty: (id: string, qty: number) => void;
   addCustomFood: (f: FoodItem) => void;
   removeCustomFood: (id: string) => void;
+  addMeasurement: (m: Omit<BodyMeasurement, "id" | "loggedAt">) => void;
+  removeMeasurement: (id: string) => void;
   updateSettings: (s: Partial<Settings>) => void;
 }
 
@@ -58,6 +71,7 @@ export const useStore = create<Store>()(
     (set) => ({
       logs: [],
       customFoods: [],
+      measurements: [],
       settings: DEFAULT_SETTINGS,
       addLog: (log) =>
         set((s) => ({
@@ -87,6 +101,15 @@ export const useStore = create<Store>()(
         set((s) => ({ customFoods: [...s.customFoods, { ...food, isCustom: true }] })),
       removeCustomFood: (id) =>
         set((s) => ({ customFoods: s.customFoods.filter((f) => f.id !== id) })),
+      addMeasurement: (m) =>
+        set((s) => ({
+          measurements: [
+            ...s.measurements,
+            { ...m, id: crypto.randomUUID(), loggedAt: Date.now() },
+          ],
+        })),
+      removeMeasurement: (id) =>
+        set((s) => ({ measurements: s.measurements.filter((m) => m.id !== id) })),
       updateSettings: (p) => set((s) => ({ settings: { ...s.settings, ...p } })),
     }),
     {

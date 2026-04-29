@@ -3,6 +3,7 @@ import { Cell, ResponsiveContainer, PieChart, Pie } from "recharts";
 import { addDays, format, startOfDay } from "date-fns";
 import { useStore } from "@/store/useStore";
 import { YearHeatmap } from "@/components/YearHeatmap";
+import { BodyTracker } from "@/components/BodyTracker";
 
 export default function Insights() {
   const { logs, settings } = useStore();
@@ -48,6 +49,8 @@ export default function Insights() {
       <h1 className="text-xl font-bold">Insights</h1>
 
       <YearHeatmap />
+
+      <BodyTracker />
 
       {macros.length > 0 && (
         <div className="rounded-2xl bg-card shadow-card p-4 border border-border/50">
